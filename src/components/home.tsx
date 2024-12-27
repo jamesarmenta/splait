@@ -4,7 +4,6 @@ import ReceiptHeader from "./receipt/ReceiptHeader";
 import ItemizedList from "./receipt/ItemizedList";
 import ParticipantList from "./receipt/ParticipantList";
 import BillSummary from "./receipt/BillSummary";
-import ShareButton from "./receipt/ShareButton";
 
 interface Participant {
   id: string;
@@ -315,12 +314,6 @@ const Home = ({
           onTipChange={(value) =>
             setReceiptData((prev) => ({ ...prev, tip: value }))
           }
-        />
-
-        <ShareButton
-          isOpen={isShareOpen}
-          onOpenChange={setIsShareOpen}
-          receiptUrl={receiptData.shareUrl}
         />
       </div>
     </div>
