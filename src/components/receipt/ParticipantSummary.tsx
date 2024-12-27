@@ -134,7 +134,7 @@ const ParticipantSummary = ({
 
           <div className="space-y-2">
             <Label htmlFor="tax">Tax</Label>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2 justify-between">
               <Input
                 id="tax"
                 type="number"
@@ -149,7 +149,7 @@ const ParticipantSummary = ({
 
           <div className="space-y-2">
             <Label htmlFor="tip">Tip</Label>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2 justify-between">
               <Input
                 id="tip"
                 type="number"
