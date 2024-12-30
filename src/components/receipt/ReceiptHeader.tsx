@@ -19,8 +19,8 @@ interface ReceiptHeaderProps {
 }
 
 const ReceiptHeader = ({
-  title = "Dinner at Restaurant",
-  totalAmount = 123.45,
+  title = "Cool Receipt",
+  totalAmount = 0,
   shareUrl = "https://split.bill/abc123",
   onTitleChange = () => {},
   onShareClick = () => {},
