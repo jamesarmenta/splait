@@ -1,9 +1,10 @@
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 import ReceiptHeader from "./receipt/ReceiptHeader";
 import ItemizedList from "./receipt/ItemizedList";
 import ParticipantList from "./receipt/ParticipantList";
-import BillSummary from "./receipt/BillSummary";
+import BillTotals from "./receipt/BillTotals";
+import ParticipantSummaries from "./receipt/ParticipantSummaries";
+import ShareButton from "./receipt/ShareButton";
 
 interface Participant {
   id: string;
@@ -31,6 +32,7 @@ interface HomeProps {
     items?: ReceiptItem[];
     participants?: Participant[];
     tax?: number;
+    taxPercentage?: number;
     tip?: number;
   };
 }
@@ -70,6 +72,7 @@ const defaultReceiptData = {
     },
   ],
   tax: 3.54,
+  taxPercentage: 15,
   tip: 8.85,
 };
 
@@ -96,7 +99,6 @@ const calculateEvenShares = (
 const Home = ({
   receiptData: initialReceiptData = defaultReceiptData,
 }: HomeProps) => {
-  const [isShareOpen, setIsShareOpen] = useState(true);
   const [receiptData, setReceiptData] = useState(initialReceiptData);
 
   const handleItemAssign = (itemId: string, participantId: string) => {
@@ -179,12 +181,14 @@ const Home = ({
         (sum, item) => sum + item.price,
         0,
       );
+      const newTax = (totalAmount * prev.taxPercentage) / 100;
 
       return {
         ...prev,
         items: updatedItems,
         participants: updatedParticipants,
         totalAmount,
+        tax: newTax,
       };
     });
   };
@@ -226,18 +230,25 @@ const Home = ({
   };
 
   const handleAddItem = (item: { name: string; price: number }) => {
-    setReceiptData((prev) => ({
-      ...prev,
-      items: [
+    setReceiptData((prev) => {
+      const newItems = [
         ...prev.items,
         {
           id: `i${prev.items.length + 1}`,
           ...item,
           assignedTo: [],
         },
-      ],
-      totalAmount: prev.totalAmount + item.price,
-    }));
+      ];
+      const totalAmount = newItems.reduce((sum, item) => sum + item.price, 0);
+      const newTax = (totalAmount * prev.taxPercentage) / 100;
+
+      return {
+        ...prev,
+        items: newItems,
+        totalAmount,
+        tax: newTax,
+      };
+    });
   };
 
   const handleUpdateItem = (
@@ -257,10 +268,13 @@ const Home = ({
         (sum, item) => sum + item.price,
         0,
       );
+      const newTax = (totalAmount * prev.taxPercentage) / 100;
+
       return {
         ...prev,
         items: updatedItems,
         totalAmount,
+        tax: newTax,
       };
     });
   };
@@ -272,10 +286,13 @@ const Home = ({
         (sum, item) => sum + item.price,
         0,
       );
+      const newTax = (totalAmount * prev.taxPercentage) / 100;
+
       return {
         ...prev,
         items: updatedItems,
         totalAmount,
+        tax: newTax,
       };
     });
   };
@@ -304,17 +321,31 @@ const Home = ({
           onDeleteItem={handleDeleteItem}
         />
 
-        <BillSummary
-          participants={receiptData.participants}
+        <BillTotals
+          subtotal={receiptData.totalAmount}
           tax={receiptData.tax}
+          taxPercentage={receiptData.taxPercentage}
           tip={receiptData.tip}
-          onTaxChange={(value) =>
-            setReceiptData((prev) => ({ ...prev, tax: value }))
+          onTaxChange={(value, percentage) =>
+            setReceiptData((prev) => ({
+              ...prev,
+              tax: value,
+              taxPercentage: percentage,
+            }))
           }
           onTipChange={(value) =>
             setReceiptData((prev) => ({ ...prev, tip: value }))
           }
         />
+
+        <ParticipantSummaries
+          participants={receiptData.participants}
+          items={receiptData.items}
+          tax={receiptData.tax}
+          tip={receiptData.tip}
+        />
+
+        <ShareButton receiptUrl={receiptData.shareUrl} />
       </div>
     </div>
   );
