@@ -27,16 +27,14 @@ const ReceiptHeader = ({
   onCopyUrl = () => {},
 }: ReceiptHeaderProps) => {
   return (
-    <div className="w-full h-20 px-6 flex items-center justify-between border-b border-gray-200 bg-white">
+    <div className="w-full h-20 flex items-center justify-between border-b border-gray-200 bg-white">
       <div className="flex items-center space-x-4">
         <Input
           value={title}
           onChange={(e) => onTitleChange(e.target.value)}
           className="text-xl w-[300px]"
         />
-        <span className="text-2xl font-bold">${totalAmount.toFixed(2)}</span>
       </div>
-
       <div className="flex items-center space-x-2">
         <TooltipProvider>
           <Tooltip>

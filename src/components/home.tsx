@@ -78,7 +78,7 @@ const defaultReceiptData = {
 
 const calculateEvenShares = (
   price: number,
-  numParticipants: number
+  numParticipants: number,
 ): number[] => {
   const totalCents = Math.round(price * 100);
   const baseShareCents = Math.floor(totalCents / numParticipants);
@@ -110,20 +110,20 @@ const Home = ({
         if (i.id === itemId) {
           const currentAssignments = i.assignedTo;
           const participantIndex = currentAssignments.findIndex(
-            (a) => a.participantId === participantId
+            (a) => a.participantId === participantId,
           );
 
           let newAssignments;
           if (participantIndex >= 0) {
             // Remove participant if already assigned
             newAssignments = currentAssignments.filter(
-              (a) => a.participantId !== participantId
+              (a) => a.participantId !== participantId,
             );
             // Recalculate shares for remaining participants if any
             if (newAssignments.length > 0) {
               const shares = calculateEvenShares(
                 i.price,
-                newAssignments.length
+                newAssignments.length,
               );
               newAssignments = newAssignments.map((a, index) => ({
                 participantId: a.participantId,
@@ -162,7 +162,7 @@ const Home = ({
 
         updatedItems.forEach((item) => {
           const assignment = item.assignedTo.find(
-            (a) => a.participantId === p.id
+            (a) => a.participantId === p.id,
           );
           if (assignment) {
             total += item.price * assignment.share;
@@ -179,7 +179,7 @@ const Home = ({
 
       const totalAmount = updatedItems.reduce(
         (sum, item) => sum + item.price,
-        0
+        0,
       );
       const newTax = (totalAmount * prev.taxPercentage) / 100;
 
@@ -216,7 +216,7 @@ const Home = ({
       const updatedItems = prev.items.map((item) => ({
         ...item,
         assignedTo: item.assignedTo.filter(
-          (a) => a.participantId !== participantId
+          (a) => a.participantId !== participantId,
         ),
       }));
 
@@ -253,7 +253,7 @@ const Home = ({
 
   const handleUpdateItem = (
     id: string,
-    updates: { name: string; price: number }
+    updates: { name: string; price: number },
   ) => {
     setReceiptData((prev) => {
       const updatedItems = prev.items.map((item) =>
@@ -262,11 +262,11 @@ const Home = ({
               ...item,
               ...updates,
             }
-          : item
+          : item,
       );
       const totalAmount = updatedItems.reduce(
         (sum, item) => sum + item.price,
-        0
+        0,
       );
       const newTax = (totalAmount * prev.taxPercentage) / 100;
 
@@ -284,7 +284,7 @@ const Home = ({
       const updatedItems = prev.items.filter((item) => item.id !== id);
       const totalAmount = updatedItems.reduce(
         (sum, item) => sum + item.price,
-        0
+        0,
       );
       const newTax = (totalAmount * prev.taxPercentage) / 100;
 
@@ -344,8 +344,6 @@ const Home = ({
           tax={receiptData.tax}
           tip={receiptData.tip}
         />
-
-        <ShareButton receiptUrl={receiptData.shareUrl} />
       </div>
     </div>
   );

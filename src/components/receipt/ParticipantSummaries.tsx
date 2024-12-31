@@ -39,11 +39,11 @@ const ParticipantSummaries = ({
   const getParticipantItems = (participantId: string) => {
     return items
       .filter((item) =>
-        item.assignedTo.some((a) => a.participantId === participantId)
+        item.assignedTo.some((a) => a.participantId === participantId),
       )
       .map((item) => {
         const assignment = item.assignedTo.find(
-          (a) => a.participantId === participantId
+          (a) => a.participantId === participantId,
         );
         return {
           name: item.name,
@@ -72,7 +72,7 @@ const ParticipantSummaries = ({
             return (
               <div
                 key={participant.id}
-                className="flex flex-col p-4 rounded-lg bg-gray-50"
+                className="flex flex-col p-4 rounded-lg bg-olive-700"
               >
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
