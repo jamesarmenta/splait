@@ -1,10 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import ReceiptHeader from "./receipt/ReceiptHeader";
 import ItemizedList from "./receipt/ItemizedList";
 import ParticipantList from "./receipt/ParticipantList";
 import BillTotals from "./receipt/BillTotals";
 import ParticipantSummaries from "./receipt/ParticipantSummaries";
-import ShareButton from "./receipt/ShareButton";
 
 interface Participant {
   id: string;
@@ -34,6 +33,7 @@ interface HomeProps {
     tax?: number;
     taxPercentage?: number;
     tip?: number;
+    tipPercentage?: number;
   };
 }
 
@@ -74,6 +74,11 @@ const defaultReceiptData = {
   tax: 3.54,
   taxPercentage: 15,
   tip: 8.85,
+  tipPercentage: 20,
+};
+
+const roundToTwoDecimals = (num: number): number => {
+  return Math.round(num * 100) / 100;
 };
 
 const calculateEvenShares = (
@@ -82,6 +87,7 @@ const calculateEvenShares = (
 ): number[] => {
   const totalCents = Math.round(price * 100);
   const baseShareCents = Math.floor(totalCents / numParticipants);
+
   const remainingCents = totalCents - baseShareCents * numParticipants;
 
   // Create array of base shares
@@ -100,6 +106,13 @@ const Home = ({
   receiptData: initialReceiptData = defaultReceiptData,
 }: HomeProps) => {
   const [receiptData, setReceiptData] = useState(initialReceiptData);
+
+  const updateTipFromPercentage = (
+    totalAmount: number,
+    tipPercentage: number,
+  ) => {
+    return roundToTwoDecimals((totalAmount * tipPercentage) / 100);
+  };
 
   const handleItemAssign = (itemId: string, participantId: string) => {
     setReceiptData((prev) => {
@@ -166,7 +179,7 @@ const Home = ({
           );
           if (assignment) {
             total += item.price * assignment.share;
-            itemCount += 1;
+            total = roundToTwoDecimals(total);
           }
         });
 
@@ -181,14 +194,16 @@ const Home = ({
         (sum, item) => sum + item.price,
         0,
       );
-      const newTax = (totalAmount * prev.taxPercentage) / 100;
+      const newTip = prev.tipPercentage
+        ? updateTipFromPercentage(totalAmount, prev.tipPercentage)
+        : prev.tip;
 
       return {
         ...prev,
         items: updatedItems,
         participants: updatedParticipants,
         totalAmount,
-        tax: newTax,
+        tip: roundToTwoDecimals(newTip),
       };
     });
   };
@@ -240,13 +255,16 @@ const Home = ({
         },
       ];
       const totalAmount = newItems.reduce((sum, item) => sum + item.price, 0);
-      const newTax = (totalAmount * prev.taxPercentage) / 100;
+      const tipToUse = prev.tipPercentage
+        ? updateTipFromPercentage(totalAmount, prev.tipPercentage)
+        : prev.tip;
+      const newTip = roundToTwoDecimals(tipToUse);
 
       return {
         ...prev,
         items: newItems,
         totalAmount,
-        tax: newTax,
+        tip: roundToTwoDecimals(newTip),
       };
     });
   };
@@ -268,13 +286,15 @@ const Home = ({
         (sum, item) => sum + item.price,
         0,
       );
-      const newTax = (totalAmount * prev.taxPercentage) / 100;
+      const newTip = prev.tipPercentage
+        ? updateTipFromPercentage(totalAmount, prev.tipPercentage)
+        : prev.tip;
 
       return {
         ...prev,
         items: updatedItems,
         totalAmount,
-        tax: newTax,
+        tip: newTip,
       };
     });
   };
@@ -286,13 +306,15 @@ const Home = ({
         (sum, item) => sum + item.price,
         0,
       );
-      const newTax = (totalAmount * prev.taxPercentage) / 100;
+      const newTip = prev.tipPercentage
+        ? updateTipFromPercentage(totalAmount, prev.tipPercentage)
+        : prev.tip;
 
       return {
         ...prev,
         items: updatedItems,
         totalAmount,
-        tax: newTax,
+        tip: newTip,
       };
     });
   };
@@ -326,6 +348,7 @@ const Home = ({
           tax={receiptData.tax}
           taxPercentage={receiptData.taxPercentage}
           tip={receiptData.tip}
+          tipPercentage={receiptData.tipPercentage}
           onTaxChange={(value, percentage) =>
             setReceiptData((prev) => ({
               ...prev,
@@ -333,8 +356,12 @@ const Home = ({
               taxPercentage: percentage,
             }))
           }
-          onTipChange={(value) =>
-            setReceiptData((prev) => ({ ...prev, tip: value }))
+          onTipChange={(value, percentage) =>
+            setReceiptData((prev) => ({
+              ...prev,
+              tip: value,
+              tipPercentage: percentage,
+            }))
           }
         />
 

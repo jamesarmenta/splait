@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -65,31 +65,19 @@ const ItemizedList = ({
   onUpdateItem = () => {},
   onDeleteItem = () => {},
 }: ItemizedListProps) => {
-  const [editingId, setEditingId] = useState<string | null>(null);
   const [newItem, setNewItem] = useState({ name: "", price: "" });
-  const [editItem, setEditItem] = useState({ name: "", price: "" });
+
+  const roundToTwoDecimals = (num: number): number => {
+    return Math.round(num * 100) / 100;
+  };
 
   const handleAddItem = () => {
     if (!newItem.name || !newItem.price) return;
     onAddItem({
       name: newItem.name,
-      price: parseFloat(newItem.price),
+      price: roundToTwoDecimals(parseFloat(newItem.price)),
     });
     setNewItem({ name: "", price: "" });
-  };
-
-  const startEditing = (item: ReceiptItem) => {
-    setEditingId(item.id);
-    setEditItem({ name: item.name, price: item.price.toString() });
-  };
-
-  const handleUpdateItem = (id: string) => {
-    if (!editItem.name || !editItem.price) return;
-    onUpdateItem(id, {
-      name: editItem.name,
-      price: parseFloat(editItem.price),
-    });
-    setEditingId(null);
   };
 
   return (
@@ -124,49 +112,13 @@ const ItemizedList = ({
         <div className="space-y-2">
           {items.map((item) => (
             <div key={item.id} className="relative">
-              {editingId === item.id ? (
-                <div className="flex items-center gap-2 p-4 border rounded-lg bg-white">
-                  <Input
-                    value={editItem.name}
-                    onChange={(e) =>
-                      setEditItem({ ...editItem, name: e.target.value })
-                    }
-                    className="flex-1"
-                  />
-                  <Input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    value={editItem.price}
-                    onChange={(e) =>
-                      setEditItem({ ...editItem, price: e.target.value })
-                    }
-                    className="w-24"
-                  />
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    onClick={() => handleUpdateItem(item.id)}
-                  >
-                    <Check className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    onClick={() => setEditingId(null)}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-              ) : (
-                <div className="flex flex-col gap-2">
-                  <ReceiptItem
-                    {...item}
-                    participants={participants}
-                    onAssign={onItemAssign}
-                  />
-                </div>
-              )}
+              <ReceiptItem
+                {...item}
+                participants={participants}
+                onAssign={onItemAssign}
+                onEdit={onUpdateItem}
+                onDelete={onDeleteItem}
+              />
             </div>
           ))}
         </div>

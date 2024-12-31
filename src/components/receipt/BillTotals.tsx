@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
@@ -9,44 +9,67 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 interface BillTotalsProps {
   subtotal: number;
   tax: number;
-  taxPercentage: number;
   tip: number;
-  onTaxChange: (value: number, percentage: number) => void;
-  onTipChange: (value: number) => void;
+  tipPercentage?: number;
+  onTaxChange: (value: number) => void;
+  onTipChange: (value: number, percentage?: number) => void;
 }
 
 const TIP_PERCENTAGES = [10, 15, 18, 20];
 
+const roundToTwoDecimals = (num: number): number => {
+  return Math.round(num * 100) / 100;
+};
+
 const BillTotals = ({
   subtotal,
   tax,
-  taxPercentage,
   tip,
+  tipPercentage,
   onTaxChange,
   onTipChange,
 }: BillTotalsProps) => {
-  const total = subtotal + tax + tip;
+  const total = roundToTwoDecimals(subtotal + tax + tip);
   const [tipMode, setTipMode] = useState<"percentage" | "amount">("percentage");
-  const [tipPercentage, setTipPercentage] = useState(
-    subtotal > 0 ? Math.round((tip / subtotal) * 100) : 15
+  const [currentTipPercentage, setCurrentTipPercentage] = useState(
+    tipPercentage || Math.round((tip / subtotal) * 100) || 15,
   );
 
+  // Update tip when subtotal changes and we're in percentage mode
+  useEffect(() => {
+    if (tipMode === "percentage" && subtotal > 0) {
+      const newTip = roundToTwoDecimals(
+        (subtotal * currentTipPercentage) / 100,
+      );
+      onTipChange(newTip, currentTipPercentage);
+    }
+  }, [subtotal, currentTipPercentage, tipMode]);
+
   const handleTipPercentageChange = (percentage: number) => {
-    setTipPercentage(percentage);
-    onTipChange((subtotal * percentage) / 100);
+    setCurrentTipPercentage(percentage);
+    const newTip = roundToTwoDecimals((subtotal * percentage) / 100);
+    onTipChange(newTip, percentage);
   };
 
   const handleTipAmountChange = (amount: number) => {
-    onTipChange(amount);
-    if (subtotal > 0) {
-      setTipPercentage(Math.round((amount / subtotal) * 100));
-    }
+    setTipMode("amount");
+    onTipChange(roundToTwoDecimals(amount));
   };
 
   const handleTaxChange = (value: string) => {
-    const amount = parseFloat(value) || 0;
-    const percentage = subtotal > 0 ? (amount / subtotal) * 100 : 0;
-    onTaxChange(amount, percentage);
+    const amount = roundToTwoDecimals(parseFloat(value) || 0);
+    onTaxChange(amount);
+  };
+
+  const handleTipModeChange = (mode: "percentage" | "amount") => {
+    setTipMode(mode);
+    if (mode === "percentage") {
+      const percentage = currentTipPercentage;
+      const newTip = roundToTwoDecimals((subtotal * percentage) / 100);
+      onTipChange(newTip, percentage);
+    } else {
+      onTipChange(roundToTwoDecimals(tip));
+    }
   };
 
   return (
@@ -56,7 +79,7 @@ const BillTotals = ({
           <span className="text-lg font-semibold mb-4 font-title">
             Subtotal
           </span>
-          <span className="font-medium">${subtotal.toFixed(2)}</span>
+          <span className="font-medium text-white">${subtotal.toFixed(2)}</span>
         </div>
 
         <div className="space-y-2">
@@ -71,8 +94,9 @@ const BillTotals = ({
               onChange={(e) => handleTaxChange(e.target.value)}
               className="w-24"
               step="0.01"
+              min="0"
             />
-            <span className="text-sm text-gray-600">${tax.toFixed(2)}</span>
+            <span className="text-sm text-white">${tax.toFixed(2)}</span>
           </div>
         </div>
 
@@ -83,7 +107,9 @@ const BillTotals = ({
             </Label>
             <Tabs
               value={tipMode}
-              onValueChange={(v) => setTipMode(v as "percentage" | "amount")}
+              onValueChange={(v) =>
+                handleTipModeChange(v as "percentage" | "amount")
+              }
             >
               <TabsList className="h-8">
                 <TabsTrigger value="percentage" className="text-xs">
@@ -102,7 +128,9 @@ const BillTotals = ({
                 {TIP_PERCENTAGES.map((percent) => (
                   <Button
                     key={percent}
-                    variant={tipPercentage === percent ? "default" : "outline"}
+                    variant={
+                      currentTipPercentage === percent ? "default" : "outline"
+                    }
                     className="flex-1 text-sm"
                     onClick={() => handleTipPercentageChange(percent)}
                   >
@@ -114,15 +142,17 @@ const BillTotals = ({
                 <div className="flex items-center gap-2">
                   <Input
                     type="number"
-                    value={tipPercentage}
+                    value={currentTipPercentage}
                     onChange={(e) =>
-                      handleTipPercentageChange(parseFloat(e.target.value))
+                      handleTipPercentageChange(parseFloat(e.target.value) || 0)
                     }
                     className="w-20"
+                    min="0"
+                    step="1"
                   />
-                  <span className="text-sm">%</span>
+                  <span className="text-sm text-white">%</span>
                 </div>
-                <span className="text-sm text-gray-600">${tip.toFixed(2)}</span>
+                <span className="text-sm text-white">${tip.toFixed(2)}</span>
               </div>
             </div>
           ) : (
@@ -131,12 +161,13 @@ const BillTotals = ({
                 type="number"
                 value={tip}
                 onChange={(e) =>
-                  handleTipAmountChange(parseFloat(e.target.value))
+                  handleTipAmountChange(parseFloat(e.target.value) || 0)
                 }
                 className="w-24"
                 step="0.01"
+                min="0"
               />
-              <span className="text-sm text-gray-600">${tip.toFixed(2)}</span>
+              <span className="text-sm text-white">${tip.toFixed(2)}</span>
             </div>
           )}
         </div>
@@ -145,7 +176,7 @@ const BillTotals = ({
 
         <div className="flex justify-between text-lg font-semibold">
           <span className="text-lg font-semibold mb-4 font-title">Total</span>
-          <span className="text-primary">${total.toFixed(2)}</span>
+          <span className="text-white">${total.toFixed(2)}</span>
         </div>
       </div>
     </Card>
