@@ -39,11 +39,11 @@ const ParticipantSummaries = ({
   const getParticipantItems = (participantId: string) => {
     return items
       .filter((item) =>
-        item.assignedTo.some((a) => a.participantId === participantId),
+        item.assignedTo.some((a) => a.participantId === participantId)
       )
       .map((item) => {
         const assignment = item.assignedTo.find(
-          (a) => a.participantId === participantId,
+          (a) => a.participantId === participantId
         );
         return {
           name: item.name,
@@ -58,7 +58,7 @@ const ParticipantSummaries = ({
   };
 
   return (
-    <Card className="p-6 w-full bg-white shadow-sm">
+    <Card className="p-6 w-full bg-white">
       <ScrollArea className="max-h-[600px]">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pr-4">
           {participants.map((participant) => {
@@ -101,19 +101,19 @@ const ParticipantSummaries = ({
                     <>
                       <Separator className="my-2" />
                       <div className="space-y-1 text-sm text-gray-600">
+                        <div className="flex justify-between">
+                          <span>Subtotal</span>
+                          <span>${participant.total.toFixed(2)}</span>
+                        </div>
                         {participantTax > 0 && (
                           <div className="flex justify-between">
-                            <span>
-                              Tax ({(sharePercentage * 100).toFixed(1)}%)
-                            </span>
+                            <span>Tax</span>
                             <span>${participantTax.toFixed(2)}</span>
                           </div>
                         )}
                         {participantTip > 0 && (
                           <div className="flex justify-between">
-                            <span>
-                              Tip ({(sharePercentage * 100).toFixed(1)}%)
-                            </span>
+                            <span>Tip</span>
                             <span>${participantTip.toFixed(2)}</span>
                           </div>
                         )}

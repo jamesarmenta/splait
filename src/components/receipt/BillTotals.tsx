@@ -28,7 +28,7 @@ const BillTotals = ({
   const total = subtotal + tax + tip;
   const [tipMode, setTipMode] = useState<"percentage" | "amount">("percentage");
   const [tipPercentage, setTipPercentage] = useState(
-    subtotal > 0 ? Math.round((tip / subtotal) * 100) : 15,
+    subtotal > 0 ? Math.round((tip / subtotal) * 100) : 15
   );
 
   const handleTipPercentageChange = (percentage: number) => {
@@ -50,16 +50,18 @@ const BillTotals = ({
   };
 
   return (
-    <Card className="p-6 w-full bg-white shadow-sm">
+    <Card className="p-6 w-full bg-card">
       <div className="space-y-4">
         <div className="flex justify-between text-sm">
-          <span className="text-gray-600">Subtotal</span>
+          <span className="text-lg font-semibold mb-4 font-title">
+            Subtotal
+          </span>
           <span className="font-medium">${subtotal.toFixed(2)}</span>
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="tax" className="text-sm">
-            Tax ({taxPercentage.toFixed(1)}%)
+            <span className="text-lg font-semibold mb-4 font-title">Tax</span>
           </Label>
           <div className="flex items-center gap-2 justify-between">
             <Input
@@ -77,7 +79,7 @@ const BillTotals = ({
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <Label htmlFor="tip" className="text-sm">
-              Tip
+              <span className="text-lg font-semibold mb-4 font-title">Tip</span>
             </Label>
             <Tabs
               value={tipMode}
@@ -142,7 +144,7 @@ const BillTotals = ({
         <Separator />
 
         <div className="flex justify-between text-lg font-semibold">
-          <span>Total</span>
+          <span className="text-lg font-semibold mb-4 font-title">Total</span>
           <span className="text-primary">${total.toFixed(2)}</span>
         </div>
       </div>

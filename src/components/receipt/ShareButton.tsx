@@ -32,7 +32,7 @@ const ShareButton = ({
   return (
     <>
       <Button
-        className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg hover:bg-primary/90"
+        className="fixed bottom-6 right-6 h-14 w-14 rounded-full hover:bg-primary/90"
         onClick={() => setIsOpen(true)}
       >
         <Share2 className="h-6 w-6" />

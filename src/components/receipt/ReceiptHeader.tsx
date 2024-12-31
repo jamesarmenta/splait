@@ -32,7 +32,7 @@ const ReceiptHeader = ({
         <Input
           value={title}
           onChange={(e) => onTitleChange(e.target.value)}
-          className="text-xl font-semibold w-[300px]"
+          className="text-xl w-[300px]"
         />
         <span className="text-2xl font-bold">${totalAmount.toFixed(2)}</span>
       </div>

@@ -34,10 +34,12 @@ const ReceiptItem = ({
   onDelete = () => {},
 }: ReceiptItemProps) => {
   return (
-    <div className="p-4 border-b border-gray-200 bg-white rounded-lg">
+    <div className="bg-card text-card-foreground rounded-lg p-4">
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2 flex-1">
-          <span className="text-sm font-medium flex-1">{name}</span>
+          <span className="text-base font-medium flex-1 font-title">
+            {name}
+          </span>
           <div className="flex items-center gap-1">
             <Button
               size="icon"
@@ -57,7 +59,9 @@ const ReceiptItem = ({
             </Button>
           </div>
           <div className="w-20 text-right">
-            <span className="text-sm font-semibold">${price.toFixed(2)}</span>
+            <span className="text-base font-semibold font-title">
+              ${price.toFixed(2)}
+            </span>
             {assignedTo.length > 0 && (
               <div className="text-xs text-gray-500">
                 ${(price / assignedTo.length).toFixed(2)} each
@@ -70,14 +74,16 @@ const ReceiptItem = ({
       <div className="flex flex-wrap gap-1">
         {participants.map((participant) => {
           const isAssigned = assignedTo.some(
-            (a) => a.participantId === participant.id,
+            (a) => a.participantId === participant.id
           );
           return (
             <Button
               key={participant.id}
               variant="outline"
               size="sm"
-              className={`h-7 px-2 ${isAssigned ? "bg-primary/10 border-primary" : ""}`}
+              className={`h-7 px-2 ${
+                isAssigned ? "bg-primary/10 border-primary" : ""
+              }`}
               onClick={() => onAssign(id, participant.id)}
             >
               <Avatar className="h-5 w-5 mr-1">

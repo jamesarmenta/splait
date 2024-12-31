@@ -64,7 +64,7 @@ const ParticipantSummary = ({
   };
 
   return (
-    <Card className="p-6 w-full h-full bg-white sticky top-4 shadow-lg">
+    <Card className="p-6 w-full h-full bg-white sticky top-4">
       <div className="space-y-6">
         <div className="flex items-center gap-2">
           <Input

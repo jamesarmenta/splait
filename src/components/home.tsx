@@ -298,7 +298,7 @@ const Home = ({
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4">
+    <div className="min-h-screen bg-background p-4">
       <div className="max-w-3xl mx-auto space-y-4">
         <ReceiptHeader
           title={receiptData.title}

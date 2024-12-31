@@ -93,7 +93,8 @@ const ItemizedList = ({
   };
 
   return (
-    <Card className="w-full h-full bg-white p-4 shadow-lg">
+    <div className="w-full h-full p-4">
+      <h2 className="text-lg font-semibold mb-4">Bill Items</h2>
       <div className="flex items-center gap-2 mb-4">
         <Input
           placeholder="Item name"
@@ -170,7 +171,7 @@ const ItemizedList = ({
           ))}
         </div>
       </ScrollArea>
-    </Card>
+    </div>
   );
 };
 
