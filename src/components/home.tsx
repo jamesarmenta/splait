@@ -10,7 +10,8 @@ interface Participant {
   name: string;
   avatarUrl: string;
   total: number;
-  items: number;
+  itemCount: number;
+  totalPortions: number;
 }
 
 interface ReceiptItem {
@@ -19,7 +20,7 @@ interface ReceiptItem {
   price: number;
   assignedTo: Array<{
     participantId: string;
-    share: number;
+    portions: number;
   }>;
 }
 
@@ -61,14 +62,16 @@ const defaultReceiptData = {
       name: "John Doe",
       avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=john",
       total: 0,
-      items: 0,
+      itemCount: 0,
+      totalPortions: 0,
     },
     {
       id: "2",
       name: "Jane Smith",
       avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=jane",
       total: 0,
-      items: 0,
+      itemCount: 0,
+      totalPortions: 0,
     },
   ],
   tax: 3.54,
@@ -79,27 +82,6 @@ const defaultReceiptData = {
 
 const roundToTwoDecimals = (num: number): number => {
   return Math.round(num * 100) / 100;
-};
-
-const calculateEvenShares = (
-  price: number,
-  numParticipants: number,
-): number[] => {
-  const totalCents = Math.round(price * 100);
-  const baseShareCents = Math.floor(totalCents / numParticipants);
-
-  const remainingCents = totalCents - baseShareCents * numParticipants;
-
-  // Create array of base shares
-  const shares = Array(numParticipants).fill(baseShareCents);
-
-  // Distribute remaining cents one by one from the start
-  for (let i = 0; i < remainingCents; i++) {
-    shares[i]++;
-  }
-
-  // Convert back to dollars
-  return shares.map((cents) => cents / 100);
 };
 
 const Home = ({
@@ -114,79 +96,77 @@ const Home = ({
     return roundToTwoDecimals((totalAmount * tipPercentage) / 100);
   };
 
-  const handleItemAssign = (itemId: string, participantId: string) => {
+  const handleItemAssign = (
+    itemId: string,
+    participantId: string,
+    portions: number = 1,
+  ) => {
     setReceiptData((prev) => {
-      const item = prev.items.find((i) => i.id === itemId);
-      if (!item) return prev;
-
-      const updatedItems = prev.items.map((i) => {
-        if (i.id === itemId) {
-          const currentAssignments = i.assignedTo;
+      const updatedItems = prev.items.map((item) => {
+        if (item.id === itemId) {
+          const currentAssignments = item.assignedTo;
           const participantIndex = currentAssignments.findIndex(
             (a) => a.participantId === participantId,
           );
 
           let newAssignments;
           if (participantIndex >= 0) {
-            // Remove participant if already assigned
-            newAssignments = currentAssignments.filter(
-              (a) => a.participantId !== participantId,
-            );
-            // Recalculate shares for remaining participants if any
-            if (newAssignments.length > 0) {
-              const shares = calculateEvenShares(
-                i.price,
-                newAssignments.length,
+            if (portions === 0) {
+              // Remove participant if portions set to 0
+              newAssignments = currentAssignments.filter(
+                (a) => a.participantId !== participantId,
               );
-              newAssignments = newAssignments.map((a, index) => ({
-                participantId: a.participantId,
-                share: shares[index] / i.price,
-              }));
+            } else {
+              // Update portions for existing participant
+              newAssignments = currentAssignments.map((a) =>
+                a.participantId === participantId ? { ...a, portions } : a,
+              );
             }
           } else {
-            // Add participant with recalculated shares
-            const totalParticipants = currentAssignments.length + 1;
-            const shares = calculateEvenShares(i.price, totalParticipants);
-
+            // Add new participant with specified portions
             newAssignments = [
-              ...currentAssignments.map((a, index) => ({
-                participantId: a.participantId,
-                share: shares[index] / i.price,
-              })),
+              ...currentAssignments,
               {
                 participantId,
-                share: shares[shares.length - 1] / i.price,
+                portions,
               },
             ];
           }
 
           return {
-            ...i,
+            ...item,
             assignedTo: newAssignments,
           };
         }
-        return i;
+        return item;
       });
 
       // Recalculate participant totals
       const updatedParticipants = prev.participants.map((p) => {
         let total = 0;
-        let itemCount = 0;
+        let participantItemCount = 0;
+        let totalPortions = 0;
 
         updatedItems.forEach((item) => {
           const assignment = item.assignedTo.find(
             (a) => a.participantId === p.id,
           );
           if (assignment) {
-            total += item.price * assignment.share;
-            total = roundToTwoDecimals(total);
+            const totalItemPortions = item.assignedTo.reduce(
+              (sum, a) => sum + a.portions,
+              0,
+            );
+            total += (item.price * assignment.portions) / totalItemPortions;
+            participantItemCount++;
+            totalPortions += assignment.portions;
           }
         });
 
         return {
           ...p,
-          total,
-          items: itemCount,
+          total: roundToTwoDecimals(total),
+          itemCount: participantItemCount,
+          totalPortions,
         };
       });
 
@@ -215,7 +195,8 @@ const Home = ({
         name,
         avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=${name.toLowerCase()}`,
         total: 0,
-        items: 0,
+        itemCount: 0,
+        totalPortions: 0,
       };
 
       return {
@@ -255,10 +236,9 @@ const Home = ({
         },
       ];
       const totalAmount = newItems.reduce((sum, item) => sum + item.price, 0);
-      const tipToUse = prev.tipPercentage
+      const newTip = prev.tipPercentage
         ? updateTipFromPercentage(totalAmount, prev.tipPercentage)
         : prev.tip;
-      const newTip = roundToTwoDecimals(tipToUse);
 
       return {
         ...prev,
@@ -294,7 +274,7 @@ const Home = ({
         ...prev,
         items: updatedItems,
         totalAmount,
-        tip: newTip,
+        tip: roundToTwoDecimals(newTip),
       };
     });
   };
@@ -314,7 +294,7 @@ const Home = ({
         ...prev,
         items: updatedItems,
         totalAmount,
-        tip: newTip,
+        tip: roundToTwoDecimals(newTip),
       };
     });
   };
@@ -346,14 +326,12 @@ const Home = ({
         <BillTotals
           subtotal={receiptData.totalAmount}
           tax={receiptData.tax}
-          taxPercentage={receiptData.taxPercentage}
           tip={receiptData.tip}
           tipPercentage={receiptData.tipPercentage}
-          onTaxChange={(value, percentage) =>
+          onTaxChange={(value) =>
             setReceiptData((prev) => ({
               ...prev,
               tax: value,
-              taxPercentage: percentage,
             }))
           }
           onTipChange={(value, percentage) =>

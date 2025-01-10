@@ -19,7 +19,6 @@ module.exports = {
     extend: {
       fontFamily: {
         title: ["Gambarino", "serif"],
-        // body: ["General Sans", "sans-serif"],
       },
       colors: {
         border: "var(--border)",
@@ -54,18 +53,6 @@ module.exports = {
         card: {
           DEFAULT: "var(--card)",
           foreground: "var(--card-foreground)",
-        },
-        olive: {
-          50: "#eff2e6",
-          100: "#dfe4cc",
-          200: "#bfc999",
-          300: "#9fae67",
-          400: "#7f9334",
-          500: "#5f7801",
-          600: "#4c6001",
-          700: "#394801",
-          800: "#263000",
-          900: "#131800",
         },
       },
       fontSize: {

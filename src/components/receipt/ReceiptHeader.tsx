@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Share2, Copy } from "lucide-react";
+import { Share2, Copy, Edit2, Check, X } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -26,14 +26,61 @@ const ReceiptHeader = ({
   onShareClick = () => {},
   onCopyUrl = () => {},
 }: ReceiptHeaderProps) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedTitle, setEditedTitle] = useState(title);
+
+  const handleSave = () => {
+    if (!editedTitle.trim()) return;
+    onTitleChange(editedTitle);
+    setIsEditing(false);
+  };
+
+  const handleCancel = () => {
+    setEditedTitle(title);
+    setIsEditing(false);
+  };
+
   return (
     <div className="w-full h-20 flex items-center justify-between border-b border-gray-200 bg-white">
       <div className="flex items-center space-x-4">
-        <Input
-          value={title}
-          onChange={(e) => onTitleChange(e.target.value)}
-          className="text-xl w-[300px]"
-        />
+        {isEditing ? (
+          <div className="flex items-center gap-2">
+            <Input
+              value={editedTitle}
+              onChange={(e) => setEditedTitle(e.target.value)}
+              className="w-[300px]"
+              placeholder="Receipt title"
+            />
+            <Button
+              size="icon"
+              variant="ghost"
+              className="h-7 w-7 text-green-500"
+              onClick={handleSave}
+            >
+              <Check className="h-3 w-3" />
+            </Button>
+            <Button
+              size="icon"
+              variant="ghost"
+              className="h-7 w-7 text-destructive"
+              onClick={handleCancel}
+            >
+              <X className="h-3 w-3" />
+            </Button>
+          </div>
+        ) : (
+          <div className="flex items-center gap-2">
+            <span className="text-xl font-medium font-title">{title}</span>
+            <Button
+              size="icon"
+              variant="ghost"
+              className="h-7 w-7"
+              onClick={() => setIsEditing(true)}
+            >
+              <Edit2 className="h-3 w-3" />
+            </Button>
+          </div>
+        )}
       </div>
       <div className="flex items-center space-x-2">
         <TooltipProvider>

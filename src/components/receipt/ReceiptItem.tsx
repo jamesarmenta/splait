@@ -1,8 +1,8 @@
-import React, { useState } from "react";
-import { Avatar } from "@/components/ui/avatar";
+import React, { useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Edit2, Trash2, Check, X } from "lucide-react";
+import ParticipantButton from "./ParticipantButton";
 
 interface Participant {
   id: string;
@@ -16,10 +16,10 @@ interface ReceiptItemProps {
   price?: number;
   assignedTo?: Array<{
     participantId: string;
-    share: number;
+    portions: number;
   }>;
   participants?: Participant[];
-  onAssign?: (id: string, participantId: string) => void;
+  onAssign?: (id: string, participantId: string, portions?: number) => void;
   onEdit?: (id: string, updates: { name: string; price: number }) => void;
   onDelete?: (id: string) => void;
 }
@@ -37,6 +37,36 @@ const ReceiptItem = ({
   const [isEditing, setIsEditing] = useState(false);
   const [editedName, setEditedName] = useState(name);
   const [editedPrice, setEditedPrice] = useState(price.toString());
+
+  const getTotalPortions = useCallback(() => {
+    return assignedTo.reduce((sum, a) => sum + a.portions, 0);
+  }, [assignedTo]);
+
+  const handlePortionChange = (participantId: string, delta: number) => {
+    const assignment = assignedTo.find(
+      (a) => a.participantId === participantId,
+    );
+    if (!assignment) {
+      // If not assigned, assign with initial portion
+      onAssign(id, participantId, Math.max(1, delta));
+    } else {
+      // Update portions, remove if going to 0
+      const newPortions = Math.max(0, assignment.portions + delta);
+      onAssign(id, participantId, newPortions);
+    }
+  };
+
+  const getParticipantShare = (participantId: string) => {
+    const assignment = assignedTo.find(
+      (a) => a.participantId === participantId,
+    );
+    if (!assignment) return 0;
+
+    const totalPortions = getTotalPortions();
+    if (totalPortions === 0) return 0;
+
+    return (assignment.portions / totalPortions) * 100;
+  };
 
   const handleSave = () => {
     if (!editedName.trim() || !editedPrice.trim()) return;
@@ -118,46 +148,34 @@ const ReceiptItem = ({
                 <span className="text-base font-semibold font-title">
                   ${price.toFixed(2)}
                 </span>
-                {assignedTo.length > 0 && (
-                  <div className="text-xs text-gray-500">
-                    ${(price / assignedTo.length).toFixed(2)} each
-                  </div>
-                )}
               </div>
             </>
           )}
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-1">
+      <div className="flex flex-wrap gap-2">
         {participants.map((participant) => {
           const isAssigned = assignedTo.some(
             (a) => a.participantId === participant.id,
           );
+          const portions =
+            assignedTo.find((a) => a.participantId === participant.id)
+              ?.portions || 0;
+          const share = getParticipantShare(participant.id);
+
           return (
-            <Button
+            <ParticipantButton
               key={participant.id}
-              variant="outline"
-              size="sm"
-              className={`h-7 px-2 ${
-                isAssigned ? "bg-primary/10 border-primary" : ""
-              }`}
-              onClick={() => onAssign(id, participant.id)}
-            >
-              <Avatar className="h-5 w-5 mr-1">
-                <img
-                  src={participant.avatarUrl}
-                  alt={participant.name}
-                  className="h-full w-full object-cover"
-                />
-              </Avatar>
-              <span className="text-xs">{participant.name}</span>
-              {isAssigned && (
-                <span className="ml-1 text-xs text-gray-500">
-                  ({(100 / assignedTo.length).toFixed(0)}%)
-                </span>
-              )}
-            </Button>
+              participant={participant}
+              isAssigned={isAssigned}
+              portions={portions}
+              share={share}
+              onAssign={() => onAssign(id, participant.id, 1)}
+              onPortionChange={(delta) =>
+                handlePortionChange(participant.id, delta)
+              }
+            />
           );
         })}
       </div>

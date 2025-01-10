@@ -3,8 +3,8 @@ import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ToggleButton } from "@/components/ui/toggle-button";
 
 interface BillTotalsProps {
   subtotal: number;
@@ -96,7 +96,7 @@ const BillTotals = ({
               step="0.01"
               min="0"
             />
-            <span className="text-sm text-white">${tax.toFixed(2)}</span>
+            <span className="text-sm text-black">${tax.toFixed(2)}</span>
           </div>
         </div>
 
@@ -126,16 +126,14 @@ const BillTotals = ({
             <div className="space-y-2">
               <div className="flex gap-2">
                 {TIP_PERCENTAGES.map((percent) => (
-                  <Button
+                  <ToggleButton
                     key={percent}
-                    variant={
-                      currentTipPercentage === percent ? "default" : "outline"
-                    }
+                    isSelected={currentTipPercentage === percent}
                     className="flex-1 text-sm"
                     onClick={() => handleTipPercentageChange(percent)}
                   >
                     {percent}%
-                  </Button>
+                  </ToggleButton>
                 ))}
               </div>
               <div className="flex items-center gap-2 justify-between">
@@ -152,7 +150,7 @@ const BillTotals = ({
                   />
                   <span className="text-sm text-white">%</span>
                 </div>
-                <span className="text-sm text-white">${tip.toFixed(2)}</span>
+                <span className="text-sm text-black">${tip.toFixed(2)}</span>
               </div>
             </div>
           ) : (
@@ -176,7 +174,7 @@ const BillTotals = ({
 
         <div className="flex justify-between text-lg font-semibold">
           <span className="text-lg font-semibold mb-4 font-title">Total</span>
-          <span className="text-white">${total.toFixed(2)}</span>
+          <span className="text-black">${total.toFixed(2)}</span>
         </div>
       </div>
     </Card>

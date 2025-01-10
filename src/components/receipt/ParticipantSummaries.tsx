@@ -9,7 +9,7 @@ interface ReceiptItem {
   price: number;
   assignedTo: Array<{
     participantId: string;
-    share: number;
+    portions: number;
   }>;
 }
 
@@ -18,7 +18,8 @@ interface Participant {
   name: string;
   avatarUrl: string;
   total: number;
-  items: number;
+  itemCount: number;
+  totalPortions: number;
 }
 
 interface ParticipantSummariesProps {
@@ -45,9 +46,15 @@ const ParticipantSummaries = ({
         const assignment = item.assignedTo.find(
           (a) => a.participantId === participantId,
         );
+        const totalPortions = item.assignedTo.reduce(
+          (sum, a) => sum + a.portions,
+          0,
+        );
         return {
           name: item.name,
-          amount: item.price * (assignment?.share || 0),
+          portions: assignment?.portions || 0,
+          totalPortions,
+          amount: (item.price * (assignment?.portions || 0)) / totalPortions,
         };
       });
   };
@@ -58,7 +65,7 @@ const ParticipantSummaries = ({
   };
 
   return (
-    <Card className="p-6 w-full bg-white">
+    <Card className="p-6 w-full bg-card">
       <ScrollArea className="max-h-[600px]">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pr-4">
           {participants.map((participant) => {
@@ -72,7 +79,7 @@ const ParticipantSummaries = ({
             return (
               <div
                 key={participant.id}
-                className="flex flex-col p-4 rounded-lg bg-olive-700"
+                className="flex flex-col p-4 rounded-lg bg-card border shadow-sm"
               >
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
@@ -81,9 +88,11 @@ const ParticipantSummaries = ({
                       alt={participant.name}
                       className="h-6 w-6 rounded-full"
                     />
-                    <span className="font-medium">{participant.name}</span>
+                    <span className="font-medium text-foreground">
+                      {participant.name}
+                    </span>
                   </div>
-                  <span className="text-primary font-semibold">
+                  <span className="font-semibold text-foreground">
                     ${participantTotal.toFixed(2)}
                   </span>
                 </div>
@@ -91,16 +100,23 @@ const ParticipantSummaries = ({
                   {participantItems.map((item, index) => (
                     <div
                       key={index}
-                      className="flex justify-between text-sm text-gray-600"
+                      className="flex justify-between text-sm text-muted-foreground"
                     >
-                      <span className="truncate mr-2">{item.name}</span>
+                      <span className="truncate mr-2">
+                        {item.name}
+                        {item.totalPortions > 1 && (
+                          <span className="text-xs text-muted-foreground/70 ml-1">
+                            ({item.portions}/{item.totalPortions} portions)
+                          </span>
+                        )}
+                      </span>
                       <span>${item.amount.toFixed(2)}</span>
                     </div>
                   ))}
                   {(participantTax > 0 || participantTip > 0) && (
                     <>
                       <Separator className="my-2" />
-                      <div className="space-y-1 text-sm text-gray-600">
+                      <div className="space-y-1 text-sm text-muted-foreground">
                         <div className="flex justify-between">
                           <span>Subtotal</span>
                           <span>${participant.total.toFixed(2)}</span>
