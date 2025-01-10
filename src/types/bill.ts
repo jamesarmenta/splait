@@ -1,7 +1,7 @@
 export interface BillParticipant {
   id: string;
   name: string;
-  avatarUrl: string;
+  emoji: string;
 }
 
 export interface BillItemAssignment {

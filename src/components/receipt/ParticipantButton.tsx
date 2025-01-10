@@ -1,12 +1,11 @@
 import React from "react";
-import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 
 interface ParticipantButtonProps {
   participant: {
     id: string;
     name: string;
-    avatarUrl?: string;
+    emoji: string;
   };
   isAssigned: boolean;
   portions: number;
@@ -37,13 +36,7 @@ const ParticipantButton = ({
       className={`h-7 px-2 transition-colors ${isAssigned ? "bg-slate-800 hover:bg-slate-700 border-slate-700" : "hover:bg-secondary"}`}
       onClick={handleClick}
     >
-      <Avatar className="h-5 w-5 mr-1">
-        <img
-          src={participant.avatarUrl}
-          alt={participant.name}
-          className="h-full w-full object-cover"
-        />
-      </Avatar>
+      <span className="mr-1 text-base">{participant.emoji}</span>
       <span className={`text-xs ${isAssigned ? "text-white" : ""}`}>
         {participant.name}
       </span>

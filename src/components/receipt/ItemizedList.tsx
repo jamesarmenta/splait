@@ -85,7 +85,7 @@ const ItemizedList = ({
       <h2 className="text-lg font-semibold mb-4">Bill Items</h2>
       <div className="flex items-center gap-2 mb-4">
         <Input
-          placeholder="Item name"
+          placeholder={"Add item"}
           value={newItem.name}
           onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
           className="flex-1"
