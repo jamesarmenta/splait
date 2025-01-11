@@ -93,6 +93,86 @@ let BILLS: Bill[] = [
     },
     shareUrl: "https://split.bill/bill_2",
   },
+  {
+    id: "bill_3",
+    title: "Group Dinner at Sushi Place",
+    createdAt: new Date(Date.now() - 259200000).toISOString(), // 3 days ago
+    updatedAt: new Date(Date.now() - 259200000).toISOString(),
+    items: [
+      {
+        id: "item_5",
+        name: "Dragon Roll",
+        price: 16.99,
+        assignedTo: [{ participantId: "user_5", portions: 1 }],
+      },
+      {
+        id: "item_6",
+        name: "California Roll",
+        price: 12.99,
+        assignedTo: [{ participantId: "user_6", portions: 1 }],
+      },
+      {
+        id: "item_7",
+        name: "Spicy Tuna Roll",
+        price: 14.99,
+        assignedTo: [], // Unassigned item
+      },
+      {
+        id: "item_8",
+        name: "Miso Soup",
+        price: 3.99,
+        assignedTo: [{ participantId: "user_7", portions: 1 }],
+      },
+      {
+        id: "item_9",
+        name: "Edamame",
+        price: 5.99,
+        assignedTo: [], // Unassigned item
+      },
+      {
+        id: "item_10",
+        name: "Green Tea Ice Cream",
+        price: 4.99,
+        assignedTo: [{ participantId: "user_5", portions: 1 }],
+      },
+      {
+        id: "item_11",
+        name: "Sake",
+        price: 18.99,
+        assignedTo: [
+          { participantId: "user_5", portions: 1 },
+          { participantId: "user_6", portions: 1 },
+          { participantId: "user_7", portions: 1 },
+        ],
+      },
+    ],
+    participants: [
+      {
+        id: "user_5",
+        name: "Alex",
+        emojiName: "sushi",
+      },
+      {
+        id: "user_6",
+        name: "Taylor",
+        emojiName: "fish",
+      },
+      {
+        id: "user_7",
+        name: "Jordan",
+        emojiName: "drink",
+      },
+    ],
+    tax: {
+      amount: 7.89,
+      percentage: 10,
+    },
+    tip: {
+      amount: 15.78,
+      percentage: 20,
+    },
+    shareUrl: "https://split.bill/bill_3",
+  },
 ];
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));

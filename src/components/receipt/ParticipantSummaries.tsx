@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { getEmojiByName } from "@/lib/emoji";
@@ -117,15 +116,15 @@ const ParticipantSummary = ({
       )}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 text-center justify-center"
+        className="text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 justify-center"
       >
         {isExpanded ? (
           <>
-            Show less <ChevronUp className="h-3 w-3" />
+            Hide <ChevronUp className="h-3 w-3" />
           </>
         ) : (
           <>
-            Show more <ChevronDown className="h-3 w-3" />
+            Expand <ChevronDown className="h-3 w-3" />
           </>
         )}
       </button>
@@ -140,6 +139,10 @@ const ParticipantSummaries = ({
   tip,
 }: ParticipantSummariesProps) => {
   const subtotal = items.reduce((sum, item) => sum + item.price, 0);
+
+  // Check for unallocated items
+  const unallocatedItems = items.filter((item) => item.assignedTo.length === 0);
+  const hasUnallocatedItems = unallocatedItems.length > 0;
 
   const getParticipantItems = (participantId: string) => {
     return items
@@ -180,6 +183,17 @@ const ParticipantSummaries = ({
   return (
     <ScrollArea className="">
       <h2 className="text-lg font-semibold mb-4">Totals</h2>
+      {hasUnallocatedItems && (
+        <div className="mb-4 p-3 bg-yellow-500/10 border-l-4 border-yellow-500 rounded flex items-center gap-2 text-sm text-yellow-700">
+          <div>
+            <span className="font-medium">
+              Heads up! No one claimed these items:
+            </span>{" "}
+            {unallocatedItems.map((item) => item.name).join(", ")}
+          </div>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {participants.map((participant) => {
           const participantItems = getParticipantItems(participant.id);
