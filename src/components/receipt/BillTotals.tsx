@@ -73,7 +73,7 @@ const BillTotals = ({
   };
 
   return (
-    <Card className="p-6 w-full bg-card">
+    <Card className="p-6 w-full">
       <div className="space-y-4">
         <div className="flex justify-between text-sm">
           <span className="text-lg font-semibold mb-4 font-title">

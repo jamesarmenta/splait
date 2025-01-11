@@ -81,7 +81,7 @@ const ItemizedList = ({
   };
 
   return (
-    <div className="w-full h-full p-4">
+    <div className="w-full h-full py-[4]">
       <h2 className="text-lg font-semibold mb-4">Bill Items</h2>
       <div className="flex items-center gap-2 mb-4">
         <Input
@@ -108,7 +108,7 @@ const ItemizedList = ({
           <Plus className="h-4 w-4" />
         </Button>
       </div>
-      <ScrollArea className="w-full pr-4">
+      <ScrollArea className="w-full">
         <div className="space-y-2">
           {items.map((item) => (
             <div key={item.id} className="relative">

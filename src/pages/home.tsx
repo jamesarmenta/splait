@@ -224,36 +224,35 @@ export default function HomePage() {
           </div>
         </Card>
 
-        <div className="grid gap-4">
-          <Card className="p-6">
-            <Button
-              onClick={handleCreateBill}
-              className="w-full h-16 text-lg"
-              size="lg"
-              disabled={isCreating || !user}
-            >
-              <Plus className="mr-2 h-5 w-5" />
-              {isCreating ? "Creating..." : "Create New Bill"}
-            </Button>
-          </Card>
+        <Card className="p-6">
+          <h2 className="text-lg font-semibold font-title">Start a Bill</h2>
+          <Button
+            onClick={handleCreateBill}
+            className="w-full h-16 text-lg"
+            size="lg"
+            disabled={isCreating || !user}
+          >
+            <Plus className="mr-2 h-5 w-5" />
+            {isCreating ? "Creating..." : "Create New Bill"}
+          </Button>
+        </Card>
 
-          <Card className="p-6">
-            <form onSubmit={handleJoinBill} className="space-y-4">
-              <h2 className="text-lg font-semibold font-title">Join a Bill</h2>
-              <div className="flex gap-2">
-                <Input
-                  placeholder="Enter bill ID"
-                  value={billId}
-                  onChange={(e) => setBillId(e.target.value)}
-                  disabled={!user}
-                />
-                <Button type="submit" disabled={!billId.trim() || !user}>
-                  <LogIn className="h-4 w-4" />
-                </Button>
-              </div>
-            </form>
-          </Card>
-        </div>
+        <Card className="p-6">
+          <form onSubmit={handleJoinBill} className="space-y-4">
+            <h2 className="text-lg font-semibold font-title">Join a Bill</h2>
+            <div className="flex gap-2">
+              <Input
+                placeholder="Enter bill ID"
+                value={billId}
+                onChange={(e) => setBillId(e.target.value)}
+                disabled={!user}
+              />
+              <Button type="submit" disabled={!billId.trim() || !user}>
+                <LogIn className="h-4 w-4" />
+              </Button>
+            </div>
+          </form>
+        </Card>
 
         <div className="space-y-4">
           <Separator />

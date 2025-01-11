@@ -18,7 +18,7 @@ const ParticipantListItem = ({
   onRemove,
 }: ParticipantListItemProps) => {
   return (
-    <div className="flex items-center gap-1 p-1 pl-2 rounded-full bg-gray-50 border">
+    <div className="flex items-center gap-1 p-1 pl-2 rounded-full bg-gray-50 border rounded-s-md rounded-tl-md rounded-tr-md rounded-br-md rounded-bl-md">
       <div className="h-6 w-6 rounded-full bg-muted flex items-center justify-center text-base">
         {getEmojiByName(participant.emojiName)}
       </div>

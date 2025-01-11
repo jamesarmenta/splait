@@ -28,7 +28,7 @@ const BillEditor = ({ initialBill }: BillEditorProps) => {
 
   return (
     <div className="min-h-screen bg-background p-4">
-      <div className="max-w-3xl mx-auto space-y-4">
+      <div className="max-w-3xl mx-auto space-y-8">
         <h2 className="text-xl font-extrabold tracking-tight lg:text-2xl">
           Totali
         </h2>

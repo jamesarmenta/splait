@@ -32,7 +32,7 @@ const ParticipantList = ({
   };
 
   return (
-    <Card className="p-4 w-full bg-white">
+    <Card className="w-full bg-white">
       <div className="space-y-4">
         <div className="flex items-center gap-2">
           <Input
