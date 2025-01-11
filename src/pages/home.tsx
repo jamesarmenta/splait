@@ -5,14 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import {
-  Plus,
-  LogIn,
-  ChevronRight,
-  Trash2,
-  UserCircle2,
-  Pencil,
-} from "lucide-react";
+import { Plus, LogIn, ChevronRight, Trash2, Pencil } from "lucide-react";
 import { createNewBill } from "@/types/bill";
 import { api } from "@/lib/api";
 import { userStorage, EMOJIS } from "@/lib/user";
@@ -133,8 +126,7 @@ export default function HomePage() {
         <Card className="p-6">
           <div className="space-y-4">
             <h2 className="text-lg font-semibold font-title flex items-center gap-2">
-              <UserCircle2 className="h-5 w-5" />
-              Your Profile
+              You
             </h2>
             {user && !isEditing ? (
               <div className="flex items-center justify-between">
@@ -144,7 +136,7 @@ export default function HomePage() {
                   </div>
                   <div>
                     <p className="font-medium">{user.name}</p>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-muted-foreground text-xs">
                       This name will be used when joining bills
                     </p>
                   </div>
