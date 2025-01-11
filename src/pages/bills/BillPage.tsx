@@ -37,7 +37,7 @@ export default function BillPage() {
               {
                 id: crypto.randomUUID(),
                 name: user.name,
-                emoji: user.emoji,
+                emojiName: user.emojiName,
               },
             ],
           };
@@ -56,7 +56,7 @@ export default function BillPage() {
               {
                 id: crypto.randomUUID(),
                 name: user.name,
-                emoji: user.emoji,
+                emojiName: user.emojiName,
               },
             ];
           }

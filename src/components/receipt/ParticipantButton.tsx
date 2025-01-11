@@ -1,11 +1,13 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
+import { getEmojiByName } from "@/lib/emoji";
+import type { EmojiName } from "@/lib/emoji";
 
 interface ParticipantButtonProps {
   participant: {
     id: string;
     name: string;
-    emoji: string;
+    emojiName: EmojiName;
   };
   isAssigned: boolean;
   portions: number;
@@ -36,7 +38,9 @@ const ParticipantButton = ({
       className={`h-7 px-2 transition-colors ${isAssigned ? "bg-slate-800 hover:bg-slate-700 border-slate-700" : "hover:bg-secondary"}`}
       onClick={handleClick}
     >
-      <span className="mr-1 text-base">{participant.emoji}</span>
+      <span className="mr-1 text-base">
+        {getEmojiByName(participant.emojiName)}
+      </span>
       <span className={`text-xs ${isAssigned ? "text-white" : ""}`}>
         {participant.name}
       </span>

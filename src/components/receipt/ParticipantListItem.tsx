@@ -1,12 +1,14 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
+import { getEmojiByName } from "@/lib/emoji";
+import type { EmojiName } from "@/lib/emoji";
 
 interface ParticipantListItemProps {
   participant: {
     id: string;
     name: string;
-    emoji: string;
+    emojiName: EmojiName;
   };
   onRemove: (id: string) => void;
 }
@@ -18,7 +20,7 @@ const ParticipantListItem = ({
   return (
     <div className="flex items-center gap-1 p-1 pl-2 rounded-full bg-gray-50 border">
       <div className="h-6 w-6 rounded-full bg-muted flex items-center justify-center text-base">
-        {participant.emoji}
+        {getEmojiByName(participant.emojiName)}
       </div>
       <span className="text-sm font-medium">{participant.name}</span>
       <Button
