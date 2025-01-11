@@ -79,7 +79,9 @@ const BillTotals = ({
           <span className="text-lg font-semibold mb-4 font-title">
             Subtotal
           </span>
-          <span className="font-medium text-black">${subtotal.toFixed(2)}</span>
+          <span className="text-base font-semibold font-title">
+            ${subtotal.toFixed(2)}
+          </span>
         </div>
 
         <div className="space-y-2">
@@ -96,7 +98,9 @@ const BillTotals = ({
               step="0.01"
               min="0"
             />
-            <span className="text-sm text-black">${tax.toFixed(2)}</span>
+            <span className="text-base font-semibold font-title">
+              ${tax.toFixed(2)}
+            </span>
           </div>
         </div>
 
@@ -148,9 +152,11 @@ const BillTotals = ({
                     min="0"
                     step="1"
                   />
-                  <span className="text-sm text-white">%</span>
+                  <span className="text-base font-semibold font-title">%</span>
                 </div>
-                <span className="text-sm text-black">${tip.toFixed(2)}</span>
+                <span className="text-base font-semibold font-title">
+                  ${tip.toFixed(2)}
+                </span>
               </div>
             </div>
           ) : (
@@ -174,7 +180,9 @@ const BillTotals = ({
 
         <div className="flex justify-between text-lg font-semibold">
           <span className="text-lg font-semibold mb-4 font-title">Total</span>
-          <span className="text-black">${total.toFixed(2)}</span>
+          <span className="text-base font-semibold font-title">
+            ${total.toFixed(2)}
+          </span>
         </div>
       </div>
     </Card>
