@@ -79,7 +79,7 @@ const BillTotals = ({
           <span className="text-lg font-semibold mb-4 font-title">
             Subtotal
           </span>
-          <span className="text-base font-semibold font-title">
+          <span className="text-lg font-semibold font-title">
             ${subtotal.toFixed(2)}
           </span>
         </div>
@@ -98,7 +98,7 @@ const BillTotals = ({
               step="0.01"
               min="0"
             />
-            <span className="text-base font-semibold font-title">
+            <span className="text-lg font-semibold font-title">
               ${tax.toFixed(2)}
             </span>
           </div>
@@ -154,7 +154,7 @@ const BillTotals = ({
                   />
                   <span className="text-base font-semibold font-title">%</span>
                 </div>
-                <span className="text-base font-semibold font-title">
+                <span className="text-lg font-semibold font-title">
                   ${tip.toFixed(2)}
                 </span>
               </div>
@@ -180,7 +180,7 @@ const BillTotals = ({
 
         <div className="flex justify-between text-lg font-semibold">
           <span className="text-lg font-semibold mb-4 font-title">Total</span>
-          <span className="text-base font-semibold font-title">
+          <span className="text-lg font-semibold font-title">
             ${total.toFixed(2)}
           </span>
         </div>

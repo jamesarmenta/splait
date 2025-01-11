@@ -9,9 +9,13 @@ import type { Bill } from "@/types/bill";
 
 interface BillEditorProps {
   initialBill: Bill;
+  onBillUpdate?: (bill: Bill) => void;
 }
 
-const BillEditor = ({ initialBill }: BillEditorProps) => {
+const BillEditor = ({
+  initialBill,
+  onBillUpdate = () => {},
+}: BillEditorProps) => {
   const {
     bill,
     summary,
@@ -22,9 +26,14 @@ const BillEditor = ({ initialBill }: BillEditorProps) => {
     updateItem,
     deleteItem,
     assignItemToParticipant,
+    updateParticipantPaidStatus,
     updateTax,
     updateTip,
   } = useBill(initialBill);
+
+  React.useEffect(() => {
+    onBillUpdate(bill);
+  }, [bill, onBillUpdate]);
 
   return (
     <div className="min-h-screen bg-background p-4">
@@ -63,6 +72,7 @@ const BillEditor = ({ initialBill }: BillEditorProps) => {
           items={bill.items}
           tax={summary.tax}
           tip={summary.tip}
+          onParticipantPaidChange={updateParticipantPaidStatus}
         />
       </div>
     </div>

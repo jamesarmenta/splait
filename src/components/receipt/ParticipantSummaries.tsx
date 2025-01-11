@@ -1,8 +1,10 @@
 import React, { useState } from "react";
+import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { getEmojiByName } from "@/lib/emoji";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { Check } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import type { EmojiName } from "@/lib/emoji";
 
 interface ReceiptItem {
@@ -19,6 +21,7 @@ interface Participant {
   id: string;
   name: string;
   emojiName: EmojiName;
+  hasPaid?: boolean;
 }
 
 interface ParticipantSummariesProps {
@@ -26,6 +29,7 @@ interface ParticipantSummariesProps {
   items: ReceiptItem[];
   tax: number;
   tip: number;
+  onParticipantPaidChange?: (participantId: string, hasPaid: boolean) => void;
 }
 
 const ParticipantSummary = ({
@@ -37,6 +41,7 @@ const ParticipantSummary = ({
   participantTax,
   participantTip,
   total,
+  onPaidChange,
 }: {
   participant: Participant;
   items: Array<{
@@ -51,32 +56,31 @@ const ParticipantSummary = ({
   participantTax: number;
   participantTip: number;
   total: number;
+  onPaidChange: (hasPaid: boolean) => void;
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <div className="flex flex-col p-3 rounded-lg bg-gray-100">
-      <div className="flex items-center justify-between mb-2">
+    <div className="flex flex-col p-4 rounded-lg bg-gray-100 shadow-sm justify-between">
+      <div className="flex text-lg items-center justify-between mb-2">
         <div className="flex items-center gap-2">
-          <div className="h-6 w-6 rounded-full bg-muted flex items-center justify-center text-base">
+          <div className="h-6 w-6 rounded-full bg-muted flex items-center justify-center">
             {getEmojiByName(participant.emojiName)}
           </div>
           <span className="font-medium text-foreground">
             {participant.name}
           </span>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="font-semibold text-foreground">
-            ${total.toFixed(2)}
-          </span>
-        </div>
+        <span className="font-semibold text-foreground">
+          ${total.toFixed(2)}
+        </span>
       </div>
       {isExpanded && (
-        <div className="mt-2 space-y-1">
+        <div className="pb-4">
           {items.map((item, index) => (
             <div
               key={index}
-              className="flex justify-between text-sm text-muted-foreground"
+              className="flex justify-between text-xs text-muted-foreground"
             >
               <span className="truncate mr-2">
                 {item.name}
@@ -91,8 +95,8 @@ const ParticipantSummary = ({
           ))}
           {(participantTax > 0 || participantTip > 0) && (
             <>
-              <Separator className="my-2" />
-              <div className="space-y-1 text-sm text-muted-foreground">
+              <Separator className="my-1" />
+              <div className="text-xs text-muted-foreground">
                 <div className="flex justify-between">
                   <span>Subtotal</span>
                   <span>${participantTotal.toFixed(2)}</span>
@@ -114,20 +118,25 @@ const ParticipantSummary = ({
           )}
         </div>
       )}
-      <button
-        onClick={() => setIsExpanded(!isExpanded)}
-        className="text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 justify-center"
-      >
-        {isExpanded ? (
-          <>
-            Hide <ChevronUp className="h-3 w-3" />
-          </>
-        ) : (
-          <>
-            Expand <ChevronDown className="h-3 w-3" />
-          </>
-        )}
-      </button>
+      <div className="flex gap-2 justify-between items-center">
+        <Button
+          variant="outline"
+          size="xs"
+          className="h-7 gap-1 grow"
+          onClick={() => setIsExpanded(!isExpanded)}
+        >
+          {isExpanded ? <>Hide details</> : <>Show details</>}
+        </Button>
+        <Button
+          variant={participant.hasPaid ? "default" : "outline"}
+          size="xs"
+          className="h-7 gap-1 grow"
+          onClick={() => onPaidChange(!participant.hasPaid)}
+        >
+          {participant.hasPaid && <Check className="h-3 w-3" />}
+          {participant.hasPaid ? "Paid" : "Mark as Paid"}
+        </Button>
+      </div>
     </div>
   );
 };
@@ -137,6 +146,7 @@ const ParticipantSummaries = ({
   items,
   tax,
   tip,
+  onParticipantPaidChange,
 }: ParticipantSummariesProps) => {
   const subtotal = items.reduce((sum, item) => sum + item.price, 0);
 
@@ -182,19 +192,15 @@ const ParticipantSummaries = ({
 
   return (
     <ScrollArea className="">
-      <h2 className="text-lg font-semibold mb-4">Totals</h2>
       {hasUnallocatedItems && (
         <div className="mb-4 p-3 bg-yellow-500/10 border-l-4 border-yellow-500 rounded flex items-center gap-2 text-sm text-yellow-700">
           <div>
-            <span className="font-medium">
-              Heads up! {unallocatedItems.length} unclaimed items:
-            </span>{" "}
+            <span className="font-medium">Heads up! Unallocated items:</span>{" "}
             {unallocatedItems.map((item) => item.name).join(", ")}
           </div>
         </div>
       )}
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4">
         {participants.map((participant) => {
           const participantItems = getParticipantItems(participant.id);
           const participantTotal = getParticipantTotal(participant.id);
@@ -214,6 +220,10 @@ const ParticipantSummaries = ({
               participantTax={participantTax}
               participantTip={participantTip}
               total={total}
+              onPaidChange={(hasPaid) =>
+                onParticipantPaidChange?.(participant.id, hasPaid)
+              }
+              className=""
             />
           );
         })}

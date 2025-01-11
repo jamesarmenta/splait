@@ -4,6 +4,7 @@ export interface BillParticipant {
   id: string;
   name: string;
   emojiName: EmojiName;
+  hasPaid?: boolean;
 }
 
 export interface BillItemAssignment {

@@ -25,6 +25,7 @@ export const useBill = (initialBill: Bill) => {
         id: crypto.randomUUID(),
         name,
         emojiName: getRandomEmojiName(),
+        hasPaid: false,
       };
 
       updateBill({
@@ -128,6 +129,17 @@ export const useBill = (initialBill: Bill) => {
     [bill.items, updateBill],
   );
 
+  const updateParticipantPaidStatus = useCallback(
+    (participantId: string, hasPaid: boolean) => {
+      updateBill({
+        participants: bill.participants.map((p) =>
+          p.id === participantId ? { ...p, hasPaid } : p,
+        ),
+      });
+    },
+    [bill.participants, updateBill],
+  );
+
   const updateTax = useCallback(
     (amount: number, percentage?: number) => {
       updateBill({
@@ -156,6 +168,7 @@ export const useBill = (initialBill: Bill) => {
     updateItem,
     deleteItem,
     assignItemToParticipant,
+    updateParticipantPaidStatus,
     updateTax,
     updateTip,
   };
