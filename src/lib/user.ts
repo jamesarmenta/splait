@@ -1,17 +1,18 @@
-import { EMOJI_MAP } from "./emoji";
+import {
+  EMOJI_MAP,
+  EmojiName,
+  getRandomEmojiName,
+  getEmojiByName,
+} from "./emoji";
 
 const USER_KEY = "totali_user";
 
-export const EMOJIS = Object.values(EMOJI_MAP);
+export const EMOJI_NAMES = Object.keys(EMOJI_MAP) as EmojiName[];
 
 export interface User {
   name: string;
-  emoji: string;
+  emojiName: EmojiName;
 }
-
-export const getRandomEmoji = () => {
-  return EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
-};
 
 export const userStorage = {
   getUser: (): User | null => {
@@ -20,10 +21,10 @@ export const userStorage = {
     return JSON.parse(data);
   },
 
-  setUser: (name: string, emoji: string = getRandomEmoji()) => {
+  setUser: (name: string, emojiName: EmojiName = getRandomEmojiName()) => {
     const user: User = {
       name,
-      emoji,
+      emojiName,
     };
     localStorage.setItem(USER_KEY, JSON.stringify(user));
     return user;

@@ -28,12 +28,12 @@ let BILLS: Bill[] = [
       {
         id: "user_1",
         name: "John",
-        emoji: "🙂",
+        emojiName: "pizza",
       },
       {
         id: "user_2",
         name: "Sarah",
-        emoji: "😊",
+        emojiName: "butterfly",
       },
     ],
     tax: {
@@ -75,12 +75,12 @@ let BILLS: Bill[] = [
       {
         id: "user_3",
         name: "Mike",
-        emoji: "😎",
+        emojiName: "game",
       },
       {
         id: "user_4",
         name: "Emma",
-        emoji: "🦋",
+        emojiName: "star",
       },
     ],
     tax: {

@@ -8,9 +8,11 @@ import { Separator } from "@/components/ui/separator";
 import { Plus, LogIn, ChevronRight, Trash2, Pencil } from "lucide-react";
 import { createNewBill } from "@/types/bill";
 import { api } from "@/lib/api";
-import { userStorage, EMOJIS } from "@/lib/user";
+import { userStorage, EMOJI_NAMES } from "@/lib/user";
+import { getEmojiByName } from "@/lib/emoji";
 import type { Bill } from "@/types/bill";
 import type { User } from "@/lib/user";
+import type { EmojiName } from "@/lib/emoji";
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -24,7 +26,9 @@ export default function HomePage() {
   );
   const [isEditing, setIsEditing] = React.useState(false);
   const [userName, setUserName] = React.useState("");
-  const [selectedEmoji, setSelectedEmoji] = React.useState(EMOJIS[0]);
+  const [selectedEmojiName, setSelectedEmojiName] = React.useState<EmojiName>(
+    EMOJI_NAMES[0],
+  );
 
   const loadBills = React.useCallback(async () => {
     try {
@@ -55,7 +59,7 @@ export default function HomePage() {
         {
           id: crypto.randomUUID(),
           name: user.name,
-          emoji: user.emoji,
+          emojiName: user.emojiName,
         },
       ];
       await api.createBill(newBill);
@@ -91,7 +95,7 @@ export default function HomePage() {
   const handleStartEdit = () => {
     if (user) {
       setUserName(user.name);
-      setSelectedEmoji(user.emoji);
+      setSelectedEmojiName(user.emojiName);
       setIsEditing(true);
     }
   };
@@ -99,7 +103,7 @@ export default function HomePage() {
   const handleSaveUser = (e: React.FormEvent) => {
     e.preventDefault();
     if (!userName.trim()) return;
-    const newUser = userStorage.setUser(userName.trim(), selectedEmoji);
+    const newUser = userStorage.setUser(userName.trim(), selectedEmojiName);
     setUser(newUser);
     setIsEditing(false);
     setUserName("");
@@ -118,9 +122,7 @@ export default function HomePage() {
       <div className="max-w-2xl mx-auto space-y-8">
         <div className="text-center space-y-2">
           <h1 className="text-3xl font-bold font-title">Totali</h1>
-          <p className="text-muted-foreground">
-            Split bills with friends, easily and fairly
-          </p>
+          <p className="text-muted-foreground">Split things with friends</p>
         </div>
 
         <Card className="p-6">
@@ -132,7 +134,7 @@ export default function HomePage() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-2xl">
-                    {user.emoji}
+                    {getEmojiByName(user.emojiName)}
                   </div>
                   <div>
                     <p className="font-medium">{user.name}</p>
@@ -164,15 +166,17 @@ export default function HomePage() {
                   </Button>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {EMOJIS.map((emoji) => (
+                  {EMOJI_NAMES.map((emojiName) => (
                     <Button
-                      key={emoji}
+                      key={emojiName}
                       type="button"
-                      variant={selectedEmoji === emoji ? "default" : "outline"}
+                      variant={
+                        selectedEmojiName === emojiName ? "default" : "outline"
+                      }
                       className="w-10 h-10 p-0 text-xl"
-                      onClick={() => setSelectedEmoji(emoji)}
+                      onClick={() => setSelectedEmojiName(emojiName)}
                     >
-                      {emoji}
+                      {getEmojiByName(emojiName)}
                     </Button>
                   ))}
                 </div>
@@ -246,7 +250,7 @@ export default function HomePage() {
                                 className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-sm ring-2 ring-background"
                                 title={participant.name}
                               >
-                                {participant.emoji}
+                                {getEmojiByName(participant.emojiName)}
                               </div>
                             ))}
                           </div>

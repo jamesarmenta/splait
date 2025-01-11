@@ -108,7 +108,7 @@ const ItemizedList = ({
           <Plus className="h-4 w-4" />
         </Button>
       </div>
-      <ScrollArea className="h-[600px] w-full pr-4">
+      <ScrollArea className="w-full pr-4">
         <div className="space-y-2">
           {items.map((item) => (
             <div key={item.id} className="relative">

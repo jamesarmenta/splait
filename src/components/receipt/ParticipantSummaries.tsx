@@ -2,6 +2,8 @@ import React from "react";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { getEmojiByName } from "@/lib/emoji";
+import type { EmojiName } from "@/lib/emoji";
 
 interface ReceiptItem {
   id: string;
@@ -16,10 +18,7 @@ interface ReceiptItem {
 interface Participant {
   id: string;
   name: string;
-  avatarUrl: string;
-  total: number;
-  itemCount: number;
-  totalPortions: number;
+  emojiName: EmojiName;
 }
 
 interface ParticipantSummariesProps {
@@ -50,18 +49,27 @@ const ParticipantSummaries = ({
           (sum, a) => sum + a.portions,
           0,
         );
+        const portions = assignment?.portions || 0;
+        const amount =
+          totalPortions > 0 ? (item.price * portions) / totalPortions : 0;
+
         return {
           name: item.name,
-          portions: assignment?.portions || 0,
+          portions,
           totalPortions,
-          amount: (item.price * (assignment?.portions || 0)) / totalPortions,
+          amount,
         };
       });
   };
 
-  const getParticipantShare = (participant: Participant) => {
+  const getParticipantTotal = (participantId: string) => {
+    const items = getParticipantItems(participantId);
+    return items.reduce((sum, item) => sum + item.amount, 0);
+  };
+
+  const getParticipantShare = (participantTotal: number) => {
     if (subtotal === 0) return 0;
-    return participant.total / subtotal;
+    return participantTotal / subtotal;
   };
 
   return (
@@ -70,11 +78,11 @@ const ParticipantSummaries = ({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pr-4">
           {participants.map((participant) => {
             const participantItems = getParticipantItems(participant.id);
-            const sharePercentage = getParticipantShare(participant);
+            const participantTotal = getParticipantTotal(participant.id);
+            const sharePercentage = getParticipantShare(participantTotal);
             const participantTax = tax * sharePercentage;
             const participantTip = tip * sharePercentage;
-            const participantTotal =
-              participant.total + participantTax + participantTip;
+            const total = participantTotal + participantTax + participantTip;
 
             return (
               <div
@@ -83,17 +91,15 @@ const ParticipantSummaries = ({
               >
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <img
-                      src={participant.avatarUrl}
-                      alt={participant.name}
-                      className="h-6 w-6 rounded-full"
-                    />
+                    <div className="h-6 w-6 rounded-full bg-muted flex items-center justify-center text-base">
+                      {getEmojiByName(participant.emojiName)}
+                    </div>
                     <span className="font-medium text-foreground">
                       {participant.name}
                     </span>
                   </div>
                   <span className="font-semibold text-foreground">
-                    ${participantTotal.toFixed(2)}
+                    ${total.toFixed(2)}
                   </span>
                 </div>
                 <div className="mt-2 space-y-1">
@@ -119,7 +125,7 @@ const ParticipantSummaries = ({
                       <div className="space-y-1 text-sm text-muted-foreground">
                         <div className="flex justify-between">
                           <span>Subtotal</span>
-                          <span>${participant.total.toFixed(2)}</span>
+                          <span>${participantTotal.toFixed(2)}</span>
                         </div>
                         {participantTax > 0 && (
                           <div className="flex justify-between">

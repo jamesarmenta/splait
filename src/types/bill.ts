@@ -1,7 +1,9 @@
+import type { EmojiName } from "@/lib/emoji";
+
 export interface BillParticipant {
   id: string;
   name: string;
-  emoji: string;
+  emojiName: EmojiName;
 }
 
 export interface BillItemAssignment {

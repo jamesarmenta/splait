@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { getRandomEmoji } from "@/lib/user";
+import { getRandomEmojiName } from "@/lib/emoji";
 import {
   Bill,
   BillItem,
@@ -24,7 +24,7 @@ export const useBill = (initialBill: Bill) => {
       const newParticipant: BillParticipant = {
         id: crypto.randomUUID(),
         name,
-        emoji: getRandomEmoji(),
+        emojiName: getRandomEmojiName(),
       };
 
       updateBill({
