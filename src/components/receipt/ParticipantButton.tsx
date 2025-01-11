@@ -38,10 +38,10 @@ const ParticipantButton = ({
       className={`h-7 px-2 transition-colors ${isAssigned ? "bg-slate-800 hover:bg-slate-700 border-slate-700" : "hover:bg-secondary"}`}
       onClick={handleClick}
     >
-      <span className="mr-1 text-base">
+      <span className="mr-1 text-sm">
         {getEmojiByName(participant.emojiName)}
       </span>
-      <span className={`text-xs ${isAssigned ? "text-white" : ""}`}>
+      <span className={`text-sm ${isAssigned ? "text-white" : ""}`}>
         {participant.name}
       </span>
     </Button>
