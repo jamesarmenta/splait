@@ -187,7 +187,7 @@ const ParticipantSummaries = ({
         <div className="mb-4 p-3 bg-yellow-500/10 border-l-4 border-yellow-500 rounded flex items-center gap-2 text-sm text-yellow-700">
           <div>
             <span className="font-medium">
-              Heads up! No one claimed these items:
+              Heads up! {unallocatedItems.length} unclaimed items:
             </span>{" "}
             {unallocatedItems.map((item) => item.name).join(", ")}
           </div>
