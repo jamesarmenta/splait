@@ -79,7 +79,7 @@ const BillTotals = ({
           <span className="text-lg font-semibold mb-4 font-title">
             Subtotal
           </span>
-          <span className="font-medium text-white">${subtotal.toFixed(2)}</span>
+          <span className="font-medium text-black">${subtotal.toFixed(2)}</span>
         </div>
 
         <div className="space-y-2">

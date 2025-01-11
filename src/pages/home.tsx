@@ -5,7 +5,14 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { Plus, LogIn, ChevronRight, Trash2, Pencil } from "lucide-react";
+import {
+  Plus,
+  LogIn,
+  ChevronRight,
+  Trash2,
+  Pencil,
+  Shuffle,
+} from "lucide-react";
 import { createNewBill } from "@/types/bill";
 import { api } from "@/lib/api";
 import { userStorage, EMOJI_NAMES } from "@/lib/user";
@@ -13,6 +20,11 @@ import { getEmojiByName } from "@/lib/emoji";
 import type { Bill } from "@/types/bill";
 import type { User } from "@/lib/user";
 import type { EmojiName } from "@/lib/emoji";
+
+const getRandomEmojis = (count: number) => {
+  const shuffled = [...EMOJI_NAMES].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, count);
+};
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -29,6 +41,13 @@ export default function HomePage() {
   const [selectedEmojiName, setSelectedEmojiName] = React.useState<EmojiName>(
     EMOJI_NAMES[0],
   );
+  const [displayedEmojis, setDisplayedEmojis] = React.useState<EmojiName[]>(
+    getRandomEmojis(12),
+  );
+
+  const regenerateEmojis = () => {
+    setDisplayedEmojis(getRandomEmojis(12));
+  };
 
   const loadBills = React.useCallback(async () => {
     try {
@@ -156,6 +175,13 @@ export default function HomePage() {
             ) : (
               <form onSubmit={handleSaveUser} className="space-y-4">
                 <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    variant={"default"}
+                    className="w-10 h-10 p-0 text-xl"
+                  >
+                    {getEmojiByName(selectedEmojiName)}
+                  </Button>
                   <Input
                     placeholder="Enter your name"
                     value={userName}
@@ -165,20 +191,33 @@ export default function HomePage() {
                     Save
                   </Button>
                 </div>
-                <div className="flex flex-wrap gap-2">
-                  {EMOJI_NAMES.map((emojiName) => (
+                <div className="space-y-2">
+                  <div className="flex flex-wrap gap-2">
+                    {displayedEmojis.map((emojiName) => (
+                      <Button
+                        key={emojiName}
+                        type="button"
+                        variant={
+                          selectedEmojiName === emojiName
+                            ? "default"
+                            : "outline"
+                        }
+                        className="w-10 h-10 p-0 text-xl"
+                        onClick={() => setSelectedEmojiName(emojiName)}
+                      >
+                        {getEmojiByName(emojiName)}
+                      </Button>
+                    ))}
                     <Button
-                      key={emojiName}
                       type="button"
-                      variant={
-                        selectedEmojiName === emojiName ? "default" : "outline"
-                      }
+                      variant="outline"
+                      size="sm"
+                      onClick={regenerateEmojis}
                       className="w-10 h-10 p-0 text-xl"
-                      onClick={() => setSelectedEmojiName(emojiName)}
                     >
-                      {getEmojiByName(emojiName)}
+                      <Shuffle className="h-4 w-4" />
                     </Button>
-                  ))}
+                  </div>
                 </div>
               </form>
             )}
