@@ -1,17 +1,15 @@
 import React, { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Avatar } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus } from "lucide-react";
+import ParticipantListItem from "./ParticipantListItem";
 
 interface Participant {
   id: string;
   name: string;
-  avatarUrl: string;
-  total: number;
-  items: number;
+  emoji: string;
 }
 
 interface ParticipantListProps {
@@ -57,27 +55,11 @@ const ParticipantList = ({
         <ScrollArea className="max-h-[120px]">
           <div className="flex flex-wrap gap-2">
             {participants.map((participant) => (
-              <div
+              <ParticipantListItem
                 key={participant.id}
-                className="flex items-center gap-1 p-1 pl-2 rounded-full bg-gray-50 border"
-              >
-                <Avatar className="h-6 w-6">
-                  <img
-                    src={participant.avatarUrl}
-                    alt={participant.name}
-                    className="h-full w-full object-cover"
-                  />
-                </Avatar>
-                <span className="text-sm font-medium">{participant.name}</span>
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  className="h-6 w-6 rounded-full text-gray-400 hover:text-destructive"
-                  onClick={() => onRemoveParticipant(participant.id)}
-                >
-                  <Trash2 className="h-3 w-3" />
-                </Button>
-              </div>
+                participant={participant}
+                onRemove={onRemoveParticipant}
+              />
             ))}
           </div>
         </ScrollArea>

@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { getRandomEmoji } from "@/lib/user";
 import {
   Bill,
   BillItem,
@@ -23,7 +24,7 @@ export const useBill = (initialBill: Bill) => {
       const newParticipant: BillParticipant = {
         id: crypto.randomUUID(),
         name,
-        avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=${name.toLowerCase()}`,
+        emoji: getRandomEmoji(),
       };
 
       updateBill({

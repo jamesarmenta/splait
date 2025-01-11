@@ -1,33 +1,17 @@
+import { EMOJI_MAP } from "./emoji";
+
 const USER_KEY = "totali_user";
 
-// Default emojis to choose from
-export const DEFAULT_EMOJIS = [
-  "👤",
-  "😊",
-  "🙂",
-  "😎",
-  "🤓",
-  "🤠",
-  "👻",
-  "🐱",
-  "🐶",
-  "🦊",
-  "🦁",
-  "🐯",
-  "🐸",
-  "🐙",
-  "🦄",
-  "🦋",
-  "🌟",
-  "🍕",
-  "🌈",
-  "🎨",
-];
+export const EMOJIS = Object.values(EMOJI_MAP);
 
 export interface User {
   name: string;
   emoji: string;
 }
+
+export const getRandomEmoji = () => {
+  return EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
+};
 
 export const userStorage = {
   getUser: (): User | null => {
@@ -36,7 +20,7 @@ export const userStorage = {
     return JSON.parse(data);
   },
 
-  setUser: (name: string, emoji: string = DEFAULT_EMOJIS[0]) => {
+  setUser: (name: string, emoji: string = getRandomEmoji()) => {
     const user: User = {
       name,
       emoji,

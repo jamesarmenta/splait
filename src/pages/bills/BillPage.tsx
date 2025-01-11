@@ -23,6 +23,27 @@ export default function BillPage() {
       try {
         const loadedBill = await api.getBill(id);
         setBill(loadedBill);
+
+        // Add current user if they exist and aren't already in the bill
+        const user = userStorage.getUser();
+        if (
+          user &&
+          !loadedBill.participants.some((p) => p.name === user.name)
+        ) {
+          const updatedBill = {
+            ...loadedBill,
+            participants: [
+              ...loadedBill.participants,
+              {
+                id: crypto.randomUUID(),
+                name: user.name,
+                emoji: user.emoji,
+              },
+            ],
+          };
+          await api.updateBill(id, updatedBill);
+          setBill(updatedBill);
+        }
       } catch (err) {
         if (err.message === "Bill not found") {
           const newBill = createNewBill();
@@ -35,7 +56,7 @@ export default function BillPage() {
               {
                 id: crypto.randomUUID(),
                 name: user.name,
-                avatarUrl: user.avatarUrl,
+                emoji: user.emoji,
               },
             ];
           }

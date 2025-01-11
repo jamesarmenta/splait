@@ -5,10 +5,17 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { Plus, LogIn, ChevronRight, Trash2, UserCircle2 } from "lucide-react";
+import {
+  Plus,
+  LogIn,
+  ChevronRight,
+  Trash2,
+  UserCircle2,
+  Pencil,
+} from "lucide-react";
 import { createNewBill } from "@/types/bill";
 import { api } from "@/lib/api";
-import { userStorage, DEFAULT_EMOJIS } from "@/lib/user";
+import { userStorage, EMOJIS } from "@/lib/user";
 import type { Bill } from "@/types/bill";
 import type { User } from "@/lib/user";
 
@@ -22,8 +29,9 @@ export default function HomePage() {
   const [user, setUser] = React.useState<User | null>(() =>
     userStorage.getUser(),
   );
+  const [isEditing, setIsEditing] = React.useState(false);
   const [userName, setUserName] = React.useState("");
-  const [selectedEmoji, setSelectedEmoji] = React.useState(DEFAULT_EMOJIS[0]);
+  const [selectedEmoji, setSelectedEmoji] = React.useState(EMOJIS[0]);
 
   const loadBills = React.useCallback(async () => {
     try {
@@ -87,18 +95,21 @@ export default function HomePage() {
     }
   };
 
+  const handleStartEdit = () => {
+    if (user) {
+      setUserName(user.name);
+      setSelectedEmoji(user.emoji);
+      setIsEditing(true);
+    }
+  };
+
   const handleSaveUser = (e: React.FormEvent) => {
     e.preventDefault();
     if (!userName.trim()) return;
     const newUser = userStorage.setUser(userName.trim(), selectedEmoji);
     setUser(newUser);
+    setIsEditing(false);
     setUserName("");
-  };
-
-  const handleClearUser = () => {
-    userStorage.clearUser();
-    setUser(null);
-    setSelectedEmoji(DEFAULT_EMOJIS[0]);
   };
 
   const formatDate = (dateString: string) => {
@@ -125,7 +136,7 @@ export default function HomePage() {
               <UserCircle2 className="h-5 w-5" />
               Your Profile
             </h2>
-            {user ? (
+            {user && !isEditing ? (
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-2xl">
@@ -141,10 +152,11 @@ export default function HomePage() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={handleClearUser}
-                  className="text-destructive hover:text-destructive"
+                  onClick={handleStartEdit}
+                  className="gap-2"
                 >
-                  Reset
+                  <Pencil className="h-4 w-4" />
+                  Edit
                 </Button>
               </div>
             ) : (
@@ -160,7 +172,7 @@ export default function HomePage() {
                   </Button>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {DEFAULT_EMOJIS.map((emoji) => (
+                  {EMOJIS.map((emoji) => (
                     <Button
                       key={emoji}
                       type="button"
