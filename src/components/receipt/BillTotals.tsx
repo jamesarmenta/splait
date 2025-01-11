@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -73,20 +72,18 @@ const BillTotals = ({
   };
 
   return (
-    <Card className="p-6 w-full">
-      <div className="space-y-4">
+    <Card className="p-6 w-full flex flex-row gap-4">
+      <div className="flex flex-col grow gap-y-4">
         <div className="flex justify-between text-sm">
-          <span className="text-lg font-semibold mb-4 font-title">
-            Subtotal
-          </span>
+          <span className="text-lg font-semibold font-title">Subtotal</span>
           <span className="text-lg font-semibold font-title">
             ${subtotal.toFixed(2)}
           </span>
         </div>
 
-        <div className="space-y-2">
+        <div className="flex flex-col gap-2">
           <Label htmlFor="tax" className="text-sm">
-            <span className="text-lg font-semibold mb-4 font-title">Tax</span>
+            <span className="text-lg font-semibold font-title">Tax</span>
           </Label>
           <div className="flex items-center gap-2 justify-between">
             <Input
@@ -104,7 +101,7 @@ const BillTotals = ({
           </div>
         </div>
 
-        <div className="space-y-2">
+        <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">
             <Label htmlFor="tip" className="text-sm">
               <span className="text-lg font-semibold mb-4 font-title">Tip</span>
@@ -127,7 +124,7 @@ const BillTotals = ({
           </div>
 
           {tipMode === "percentage" ? (
-            <div className="space-y-2">
+            <div className="flex flex-col gap-4">
               <div className="flex gap-2">
                 {TIP_PERCENTAGES.map((percent) => (
                   <ToggleButton
@@ -171,15 +168,15 @@ const BillTotals = ({
                 step="0.01"
                 min="0"
               />
-              <span className="text-sm text-white">${tip.toFixed(2)}</span>
+              <span className="text-lg font-semibold font-title">
+                ${tip.toFixed(2)}
+              </span>
             </div>
           )}
         </div>
 
-        <Separator />
-
         <div className="flex justify-between text-lg font-semibold">
-          <span className="text-lg font-semibold mb-4 font-title">Total</span>
+          <span className="text-lg font-semibold font-title">Total</span>
           <span className="text-lg font-semibold font-title">
             ${total.toFixed(2)}
           </span>
