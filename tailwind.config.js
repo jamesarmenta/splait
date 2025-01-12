@@ -52,7 +52,7 @@ module.exports = {
           foreground: "var(--popover-foreground)",
         },
         card: {
-          DEFAULT: "var(--card)",
+          DEFAULT: "white",
           foreground: "var(--card-foreground)",
         },
       },

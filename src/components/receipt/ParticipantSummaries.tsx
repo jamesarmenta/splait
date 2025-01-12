@@ -61,7 +61,7 @@ const ParticipantSummary = ({
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <div className="flex flex-col p-4 rounded-lg bg-gray-100 shadow-sm justify-between">
+    <div className="flex flex-col p-4 rounded-lg bg-card shadow-sm justify-between">
       <div className="flex text-lg items-center justify-between mb-2">
         <div className="flex items-center gap-2">
           <div className="h-6 w-6 rounded-full bg-muted flex items-center justify-center">

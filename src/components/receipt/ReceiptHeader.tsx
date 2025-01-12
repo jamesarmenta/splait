@@ -41,7 +41,7 @@ const ReceiptHeader = ({
   };
 
   return (
-    <div className="w-full h-20 flex items-center justify-between border-b border-gray-200 bg-white">
+    <div className="w-full h-20 flex items-center justify-between">
       <div className="flex items-center space-x-4">
         {isEditing ? (
           <div className="flex items-center gap-2">
