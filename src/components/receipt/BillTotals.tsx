@@ -3,6 +3,8 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ToggleButton } from "@/components/ui/toggle-button";
+import { Button } from "@/components/ui/button";
+import { Minus, Plus } from "lucide-react";
 
 interface BillTotalsProps {
   subtotal: number;
@@ -51,6 +53,26 @@ const BillTotals = ({
     onTaxChange(amount);
   };
 
+  const adjustTipByOnePercent = (increment: boolean) => {
+    if (subtotal === 0) return;
+
+    // Round to 1 decimal place to avoid floating point issues
+    const currentPercent = Math.round((tip / subtotal) * 1000) / 10;
+
+    // If at a whole number, add/subtract 1, otherwise round to nearest whole number in desired direction
+    const newPercent = increment
+      ? Number.isInteger(currentPercent)
+        ? currentPercent + 1
+        : Math.ceil(currentPercent)
+      : Number.isInteger(currentPercent)
+        ? currentPercent - 1
+        : Math.floor(currentPercent);
+
+    const newTip = roundToTwoDecimals((subtotal * newPercent) / 100);
+    setCurrentTipPercentage(newPercent);
+    onTipChange(newTip, newPercent);
+  };
+
   return (
     <Card className="p-6 w-full flex flex-row gap-4">
       <div className="flex flex-col grow gap-y-4">
@@ -96,7 +118,7 @@ const BillTotals = ({
             </span>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 justify-between">
             <Input
               type="number"
               value={tip}
@@ -105,7 +127,16 @@ const BillTotals = ({
               min="0"
               step="0.01"
             />
-            <div className="flex gap-2">
+            <div className="w-full px-8 flex gap-2 items-center">
+              <Button
+                variant="clickable"
+                size="sm"
+                className="h-8 px-2"
+                onClick={() => adjustTipByOnePercent(false)}
+                disabled={subtotal === 0}
+              >
+                -1%
+              </Button>
               {TIP_PERCENTAGES.map((percent) => (
                 <ToggleButton
                   key={percent}
@@ -116,6 +147,15 @@ const BillTotals = ({
                   {percent}%
                 </ToggleButton>
               ))}
+              <Button
+                variant="clickable"
+                size="sm"
+                className="h-8 px-2"
+                onClick={() => adjustTipByOnePercent(true)}
+                disabled={subtotal === 0}
+              >
+                +1%
+              </Button>
             </div>
           </div>
         </div>

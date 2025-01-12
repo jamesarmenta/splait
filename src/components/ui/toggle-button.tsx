@@ -15,7 +15,7 @@ const ToggleButton = React.forwardRef<HTMLButtonElement, ToggleButtonProps>(
         variant="outline"
         size="sm"
         className={cn(
-          "h-7 px-2 transition-colors",
+          "h-7 px-2 transition-colors bg-clickable",
           isSelected
             ? "bg-slate-800 hover:bg-slate-700 border-slate-700 text-white"
             : "hover:bg-secondary",
