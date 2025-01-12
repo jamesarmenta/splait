@@ -35,7 +35,7 @@ const ParticipantButton = ({
     <Button
       variant="outline"
       size="sm"
-      className={`h-7 px-2 transition-colors ${isAssigned ? "bg-slate-800 hover:bg-slate-700 border-slate-700" : "hover:bg-secondary"}`}
+      className={`h-7 px-2 transition-colors bg-clickable ${isAssigned ? "bg-slate-800 hover:bg-slate-700 border-slate-700" : "hover:bg-secondary"}`}
       onClick={handleClick}
     >
       <span className="mr-1 text-sm">

@@ -179,13 +179,12 @@ const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const api = {
   async createBill(bill: Bill): Promise<Bill> {
-    await delay(500); // Simulate network delay
+    // Simulate network delay
     BILLS.unshift(bill); // Add to start of array
     return bill;
   },
 
   async getBill(id: string): Promise<Bill> {
-    await delay(500);
     const bill = BILLS.find((b) => b.id === id);
     if (!bill) {
       throw new Error("Bill not found");
@@ -194,7 +193,6 @@ export const api = {
   },
 
   async updateBill(id: string, bill: Bill): Promise<Bill> {
-    await delay(500);
     const index = BILLS.findIndex((b) => b.id === id);
     if (index === -1) {
       throw new Error("Bill not found");
@@ -204,7 +202,6 @@ export const api = {
   },
 
   async deleteBill(id: string): Promise<void> {
-    await delay(500);
     const index = BILLS.findIndex((b) => b.id === id);
     if (index === -1) {
       throw new Error("Bill not found");
@@ -213,7 +210,6 @@ export const api = {
   },
 
   async listBills(): Promise<Bill[]> {
-    await delay(500);
     return BILLS;
   },
 };

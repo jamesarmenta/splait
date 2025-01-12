@@ -21,6 +21,7 @@ module.exports = {
         title: ["Gambarino", "serif"],
       },
       colors: {
+        clickable: "rgb(229 231 235)" /* gray-200 */,
         border: "var(--border)",
         input: "var(--input)",
         ring: "var(--ring)",

@@ -71,7 +71,7 @@ const ParticipantSummary = ({
             {participant.name}
           </span>
         </div>
-        <span className="font-semibold text-foreground">
+        <span className="font-semibold text-foreground font-title">
           ${total.toFixed(2)}
         </span>
       </div>
@@ -120,7 +120,7 @@ const ParticipantSummary = ({
       )}
       <div className="flex gap-2 justify-between items-center">
         <Button
-          variant="outline"
+          variant="clickable"
           size="xs"
           className="h-7 gap-1 grow"
           onClick={() => setIsExpanded(!isExpanded)}
@@ -128,7 +128,7 @@ const ParticipantSummary = ({
           {isExpanded ? <>Hide details</> : <>Show details</>}
         </Button>
         <Button
-          variant={participant.hasPaid ? "default" : "outline"}
+          variant={participant.hasPaid ? "default" : "clickable"}
           size="xs"
           className="h-7 gap-1 grow"
           onClick={() => onPaidChange(!participant.hasPaid)}
