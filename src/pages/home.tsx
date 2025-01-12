@@ -1,17 +1,15 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
 import {
   Plus,
-  LogIn,
   ChevronRight,
   Trash2,
   Pencil,
   Shuffle,
+  Camera,
 } from "lucide-react";
 import { createNewBill } from "@/types/bill";
 import { api } from "@/lib/api";
@@ -21,6 +19,18 @@ import type { Bill } from "@/types/bill";
 import type { User } from "@/lib/user";
 import type { EmojiName } from "@/lib/emoji";
 
+const JOIN_EMOJI_OPTIONS: EmojiName[] = [
+  "heart",
+  "apple",
+  "rainbow",
+  "pizza",
+  "happy",
+  "baloon",
+  "star",
+  "tree",
+  "fire",
+];
+
 const getRandomEmojis = (count: number) => {
   const shuffled = [...EMOJI_NAMES].sort(() => Math.random() - 0.5);
   return shuffled.slice(0, count);
@@ -28,7 +38,6 @@ const getRandomEmojis = (count: number) => {
 
 export default function HomePage() {
   const navigate = useNavigate();
-  const [billId, setBillId] = React.useState("");
   const [isCreating, setIsCreating] = React.useState(false);
   const [bills, setBills] = React.useState<Bill[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
@@ -44,6 +53,9 @@ export default function HomePage() {
   const [displayedEmojis, setDisplayedEmojis] = React.useState<EmojiName[]>(
     getRandomEmojis(12),
   );
+  const [selectedJoinEmojis, setSelectedJoinEmojis] = React.useState<
+    EmojiName[]
+  >([]);
 
   const regenerateEmojis = () => {
     setDisplayedEmojis(getRandomEmojis(12));
@@ -92,13 +104,16 @@ export default function HomePage() {
 
   const handleJoinBill = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!billId.trim()) return;
     if (!user) {
       alert("Please set your name first");
       return;
     }
 
-    navigate(`/bills/${billId}`);
+    if (selectedJoinEmojis.length !== 3) return;
+
+    // TODO: Convert emoji combination to bill ID
+    const mockBillId = selectedJoinEmojis.join("-");
+    navigate(`/bills/${mockBillId}`);
   };
 
   const handleDeleteBill = async (e: React.MouseEvent, billId: string) => {
@@ -128,6 +143,18 @@ export default function HomePage() {
     setUserName("");
   };
 
+  const handleJoinEmojiClick = (emojiName: EmojiName) => {
+    if (selectedJoinEmojis.includes(emojiName)) {
+      setSelectedJoinEmojis(selectedJoinEmojis.filter((e) => e !== emojiName));
+    } else if (selectedJoinEmojis.length < 3) {
+      setSelectedJoinEmojis([...selectedJoinEmojis, emojiName]);
+    }
+  };
+
+  const handleBackspace = () => {
+    setSelectedJoinEmojis(selectedJoinEmojis.slice(0, -1));
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString(undefined, {
       month: "short",
@@ -141,7 +168,7 @@ export default function HomePage() {
       <div className="max-w-2xl mx-auto space-y-8">
         <div className="text-center space-y-2">
           <h1 className="text-3xl font-bold font-title">Totali</h1>
-          <p className="text-muted-foreground">Split things with friends</p>
+          <p className="text-muted-foreground">Split, tap, done</p>
         </div>
 
         <Card className="p-6">
@@ -182,7 +209,8 @@ export default function HomePage() {
                   >
                     {getEmojiByName(selectedEmojiName)}
                   </Button>
-                  <Input
+                  <input
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                     placeholder="Enter your name"
                     value={userName}
                     onChange={(e) => setUserName(e.target.value)}
@@ -226,36 +254,81 @@ export default function HomePage() {
 
         <Card className="p-6">
           <h2 className="text-lg font-semibold font-title">Start a Bill</h2>
-          <Button
-            onClick={handleCreateBill}
-            className="w-full h-16 text-lg"
-            size="lg"
-            disabled={isCreating || !user}
-          >
-            <Plus className="mr-2 h-5 w-5" />
-            {isCreating ? "Creating..." : "Create New Bill"}
-          </Button>
+          <div className="grid grid-cols-2 gap-4 mt-4">
+            <Button
+              onClick={handleCreateBill}
+              className="h-16 text-lg"
+              size="lg"
+              disabled={isCreating || !user}
+            >
+              <Plus className="mr-2 h-5 w-5" />
+              <div className="flex flex-col items-start text-left">
+                <span className="text-base">Start from Scratch</span>
+              </div>
+            </Button>
+            <Button
+              variant="outline"
+              className="h-16 text-lg"
+              size="lg"
+              disabled={true}
+              title="Coming soon!"
+            >
+              <Camera className="mr-2 h-5 w-5" />
+              <div className="flex flex-col items-start text-left">
+                <span className="text-base">Start from Photo</span>
+                <span className="text-xs text-muted-foreground">
+                  Coming soon
+                </span>
+              </div>
+            </Button>
+          </div>
         </Card>
 
         <Card className="p-6">
           <form onSubmit={handleJoinBill} className="space-y-4">
             <h2 className="text-lg font-semibold font-title">Join a Bill</h2>
-            <div className="flex gap-2">
-              <Input
-                placeholder="Enter bill ID"
-                value={billId}
-                onChange={(e) => setBillId(e.target.value)}
-                disabled={!user}
-              />
-              <Button type="submit" disabled={!billId.trim() || !user}>
-                <LogIn className="h-4 w-4" />
+            <div className="space-y-4 flex flex-col items-center">
+              <div className="flex items-center gap-4 justify-center mb-2 w-full">
+                {[0, 1, 2].map((index) => (
+                  <div
+                    key={index}
+                    className="w-full h-16 rounded-lg bg-gray-200 flex items-center justify-center text-3xl bg-muted"
+                  >
+                    {selectedJoinEmojis[index] ? (
+                      getEmojiByName(selectedJoinEmojis[index])
+                    ) : (
+                      <span className="text-muted-foreground text-sm"></span>
+                    )}
+                  </div>
+                ))}
+              </div>
+              <div className="grid grid-cols-3 gap-2 w-full">
+                {JOIN_EMOJI_OPTIONS.map((emojiName) => (
+                  <Button
+                    key={emojiName}
+                    type="button"
+                    variant=""
+                    className="w-full h-16 p-0 text-3xl bg-gray-200"
+                    onClick={() => handleJoinEmojiClick(emojiName)}
+                  >
+                    {getEmojiByName(emojiName)}
+                  </Button>
+                ))}
+              </div>
+              <Button
+                type="button"
+                variant=""
+                className="w-full bg-gray-200"
+                disabled={selectedJoinEmojis.length === 0}
+                onClick={handleBackspace}
+              >
+                Backspace
               </Button>
             </div>
           </form>
         </Card>
 
         <div className="space-y-4">
-          <Separator />
           <h2 className="text-xl font-semibold font-title">Recent Bills</h2>
 
           {isLoading ? (
