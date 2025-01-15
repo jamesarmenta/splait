@@ -16,6 +16,7 @@ interface ReceiptHeaderProps {
   onTitleChange?: (title: string) => void;
   onShareClick?: () => void;
   onCopyUrl?: () => void;
+  updatedAt?: string;
 }
 
 const ReceiptHeader = ({
@@ -24,6 +25,7 @@ const ReceiptHeader = ({
   shareUrl = "https://split.bill/abc123",
   onTitleChange = () => {},
   onShareClick = () => {},
+  updatedAt,
   onCopyUrl = () => {},
 }: ReceiptHeaderProps) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -31,6 +33,7 @@ const ReceiptHeader = ({
 
   const handleSave = () => {
     if (!editedTitle.trim()) return;
+    if (editedTitle.length > 75) return;
     onTitleChange(editedTitle);
     setIsEditing(false);
   };
@@ -40,8 +43,16 @@ const ReceiptHeader = ({
     setIsEditing(false);
   };
 
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString(undefined, {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+  };
+
   return (
-    <div className="w-full h-20 flex items-center justify-between">
+    <div className="w-full flex items-center justify-between">
       <div className="flex items-center space-x-4">
         {isEditing ? (
           <div className="flex items-center gap-2">
@@ -50,6 +61,7 @@ const ReceiptHeader = ({
               onChange={(e) => setEditedTitle(e.target.value)}
               className="w-[300px]"
               placeholder="Receipt title"
+              maxLength={75}
             />
             <Button
               size="icon"
@@ -70,15 +82,24 @@ const ReceiptHeader = ({
           </div>
         ) : (
           <div className="flex items-center gap-2">
-            <span className="text-xl font-medium font-title">{title}</span>
-            <Button
-              size="icon"
-              variant="ghost"
-              className="h-7 w-7"
-              onClick={() => setIsEditing(true)}
-            >
-              <Edit2 className="h-3 w-3" />
-            </Button>
+            <div className="flex flex-col">
+              <div>
+                <span className="text-xl font-medium font-title">{title}</span>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="h-7 w-7"
+                  onClick={() => setIsEditing(true)}
+                >
+                  <Edit2 className="h-3 w-3" />
+                </Button>
+              </div>
+              {updatedAt && (
+                <span className="text-sm text-muted-foreground">
+                  {formatDate(updatedAt)}
+                </span>
+              )}
+            </div>
           </div>
         )}
       </div>

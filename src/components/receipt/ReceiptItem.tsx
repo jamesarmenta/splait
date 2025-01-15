@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { CurrencyInput } from "@/components/ui/currency-input";
 import { Card } from "@/components/ui/card";
 import { Edit2, Trash2, Check, X } from "lucide-react";
 import ParticipantButton from "./ParticipantButton";
@@ -25,6 +26,13 @@ interface ReceiptItemProps {
   onDelete?: (id: string) => void;
 }
 
+const formatCurrency = (amount: number): string => {
+  return amount.toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+};
+
 const ReceiptItem = ({
   id = "1",
   name = "Sample Item",
@@ -37,7 +45,7 @@ const ReceiptItem = ({
 }: ReceiptItemProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedName, setEditedName] = useState(name);
-  const [editedPrice, setEditedPrice] = useState(price.toString());
+  const [editedPrice, setEditedPrice] = useState(price);
 
   const getTotalPortions = useCallback(() => {
     return assignedTo.reduce((sum, a) => sum + a.portions, 0);
@@ -70,17 +78,18 @@ const ReceiptItem = ({
   };
 
   const handleSave = () => {
-    if (!editedName.trim() || !editedPrice.trim()) return;
+    if (!editedName.trim()) return;
+    if (editedName.length > 50) return;
     onEdit(id, {
       name: editedName,
-      price: parseFloat(editedPrice),
+      price: editedPrice,
     });
     setIsEditing(false);
   };
 
   const handleCancel = () => {
     setEditedName(name);
-    setEditedPrice(price.toString());
+    setEditedPrice(price);
     setIsEditing(false);
   };
 
@@ -96,14 +105,12 @@ const ReceiptItem = ({
                   onChange={(e) => setEditedName(e.target.value)}
                   className="flex-1"
                   placeholder="Item name"
+                  maxLength={50}
                 />
-                <Input
-                  type="number"
+                <CurrencyInput
                   value={editedPrice}
-                  onChange={(e) => setEditedPrice(e.target.value)}
+                  onChange={setEditedPrice}
                   className="w-24"
-                  step="0.01"
-                  min="0"
                   placeholder="Price"
                 />
                 <Button
@@ -148,7 +155,7 @@ const ReceiptItem = ({
                 </div>
                 <div className="w-20 text-right">
                   <span className="text-base font-semibold font-title">
-                    ${price.toFixed(2)}
+                    ${formatCurrency(price)}
                   </span>
                 </div>
               </>

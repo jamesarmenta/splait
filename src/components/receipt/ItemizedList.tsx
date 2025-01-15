@@ -3,7 +3,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, Edit2, Trash2, Check, X } from "lucide-react";
+import { CurrencyInput } from "@/components/ui/currency-input";
+import { Plus } from "lucide-react";
 import ReceiptItem from "./ReceiptItem";
 
 interface ReceiptItem {
@@ -65,19 +66,16 @@ const ItemizedList = ({
   onUpdateItem = () => {},
   onDeleteItem = () => {},
 }: ItemizedListProps) => {
-  const [newItem, setNewItem] = useState({ name: "", price: "" });
-
-  const roundToTwoDecimals = (num: number): number => {
-    return Math.round(num * 100) / 100;
-  };
+  const [newItem, setNewItem] = useState({ name: "", price: 0 });
 
   const handleAddItem = () => {
-    if (!newItem.name || !newItem.price) return;
+    if (!newItem.name) return;
+    if (newItem.name.length > 50) return;
     onAddItem({
       name: newItem.name,
-      price: roundToTwoDecimals(parseFloat(newItem.price)),
+      price: newItem.price,
     });
-    setNewItem({ name: "", price: "" });
+    setNewItem({ name: "", price: 0 });
   };
 
   return (
@@ -90,21 +88,19 @@ const ItemizedList = ({
             value={newItem.name}
             onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
             className="flex-1"
+            maxLength={50}
           />
-          <Input
+          <CurrencyInput
             placeholder="Price"
-            type="number"
-            step="0.01"
-            min="0"
             value={newItem.price}
-            onChange={(e) => setNewItem({ ...newItem, price: e.target.value })}
+            onChange={(value) => setNewItem({ ...newItem, price: value })}
             className="w-24"
           />
           <Button
             size="icon"
             variant="outline"
             onClick={handleAddItem}
-            disabled={!newItem.name || !newItem.price}
+            disabled={!newItem.name}
           >
             <Plus className="h-4 w-4" />
           </Button>

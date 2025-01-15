@@ -44,6 +44,7 @@ const BillEditor = ({
         <ReceiptHeader
           title={bill.title}
           shareUrl={bill.shareUrl}
+          updatedAt={bill.updatedAt}
           onTitleChange={(title) => updateBill({ title })}
         />
         <ParticipantList

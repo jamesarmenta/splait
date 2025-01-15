@@ -17,6 +17,7 @@ import { userStorage, EMOJI_NAMES } from "@/lib/user";
 import { getEmojiByName } from "@/lib/emoji";
 import type { Bill } from "@/types/bill";
 import type { User } from "@/lib/user";
+import ItemizedList from "./../components/receipt/ItemizedList.tsx";
 import type { EmojiName } from "@/lib/emoji";
 
 const JOIN_EMOJI_OPTIONS: EmojiName[] = [
@@ -179,7 +180,7 @@ export default function HomePage() {
             {user && !isEditing ? (
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-2xl">
+                  <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center text-3xl">
                     {getEmojiByName(user.emojiName)}
                   </div>
                   <div>
@@ -205,7 +206,7 @@ export default function HomePage() {
                   <Button
                     type="button"
                     variant={"default"}
-                    className="w-10 h-10 p-0 text-xl"
+                    className="w-12 h-12 p-0 text-3xl"
                   >
                     {getEmojiByName(selectedEmojiName)}
                   </Button>
@@ -228,7 +229,7 @@ export default function HomePage() {
                         variant={
                           selectedEmojiName === emojiName
                             ? "default"
-                            : "outline"
+                            : "clickable"
                         }
                         className="w-10 h-10 p-0 text-xl"
                         onClick={() => setSelectedEmojiName(emojiName)}
@@ -258,6 +259,7 @@ export default function HomePage() {
             <Button
               onClick={handleCreateBill}
               className="h-16 text-lg"
+              variant="clickable"
               size="lg"
               disabled={isCreating || !user}
             >
@@ -292,7 +294,7 @@ export default function HomePage() {
                 {[0, 1, 2].map((index) => (
                   <div
                     key={index}
-                    className="w-full h-16 rounded-lg bg-gray-200 flex items-center justify-center text-3xl bg-muted"
+                    className="w-full h-16 rounded-lg bg-gray-100 flex items-center justify-center text-3xl"
                   >
                     {selectedJoinEmojis[index] ? (
                       getEmojiByName(selectedJoinEmojis[index])
@@ -389,6 +391,7 @@ export default function HomePage() {
           )}
         </div>
       </div>
+      <ItemizedList />
     </div>
   );
 }

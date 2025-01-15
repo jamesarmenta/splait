@@ -18,7 +18,7 @@ module.exports = {
     },
     extend: {
       fontFamily: {
-        title: ["Gambarino", "serif"],
+        title: ["Outfit", "serif"],
       },
       colors: {
         clickable: "rgb(229 231 235)" /* gray-200 */,

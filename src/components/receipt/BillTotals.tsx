@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { CurrencyInput } from "@/components/ui/currency-input";
 import { ToggleButton } from "@/components/ui/toggle-button";
 import { Button } from "@/components/ui/button";
-import { Minus, Plus } from "lucide-react";
 
 interface BillTotalsProps {
   subtotal: number;
@@ -17,8 +16,11 @@ interface BillTotalsProps {
 
 const TIP_PERCENTAGES = [10, 15, 18, 20];
 
-const roundToTwoDecimals = (num: number): number => {
-  return Math.round(num * 100) / 100;
+const formatCurrency = (amount: number): string => {
+  return amount.toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
 };
 
 const BillTotals = ({
@@ -29,28 +31,21 @@ const BillTotals = ({
   onTaxChange,
   onTipChange,
 }: BillTotalsProps) => {
-  const total = roundToTwoDecimals(subtotal + tax + tip);
+  const total = subtotal + tax + tip;
   const [currentTipPercentage, setCurrentTipPercentage] = useState(
     tipPercentage || Math.round((tip / subtotal) * 100) || 15,
   );
 
-  const handleTipAmountChange = (amount: string) => {
-    const tipAmount = roundToTwoDecimals(parseFloat(amount) || 0);
-    const percentage =
-      subtotal > 0 ? Math.round((tipAmount / subtotal) * 100) : 0;
+  const handleTipAmountChange = (value: number) => {
+    const percentage = subtotal > 0 ? Math.round((value / subtotal) * 100) : 0;
     setCurrentTipPercentage(percentage);
-    onTipChange(tipAmount, percentage);
+    onTipChange(value, percentage);
   };
 
   const handleTipPercentageClick = (percentage: number) => {
     setCurrentTipPercentage(percentage);
-    const newTip = roundToTwoDecimals((subtotal * percentage) / 100);
+    const newTip = (subtotal * percentage) / 100;
     onTipChange(newTip, percentage);
-  };
-
-  const handleTaxChange = (value: string) => {
-    const amount = roundToTwoDecimals(parseFloat(value) || 0);
-    onTaxChange(amount);
   };
 
   const adjustTipByOnePercent = (increment: boolean) => {
@@ -68,7 +63,7 @@ const BillTotals = ({
         ? currentPercent - 1
         : Math.floor(currentPercent);
 
-    const newTip = roundToTwoDecimals((subtotal * newPercent) / 100);
+    const newTip = (subtotal * newPercent) / 100;
     setCurrentTipPercentage(newPercent);
     onTipChange(newTip, newPercent);
   };
@@ -79,7 +74,7 @@ const BillTotals = ({
         <div className="flex justify-between text-sm">
           <span className="text-lg font-semibold font-title">Subtotal</span>
           <span className="text-lg font-semibold font-title">
-            ${subtotal.toFixed(2)}
+            ${formatCurrency(subtotal)}
           </span>
         </div>
 
@@ -89,18 +84,15 @@ const BillTotals = ({
               <span className="text-lg font-semibold font-title">Tax</span>
             </Label>
             <span className="text-lg font-semibold font-title">
-              ${tax.toFixed(2)}
+              ${formatCurrency(tax)}
             </span>
           </div>
           <div className="flex items-center gap-2 justify-between">
-            <Input
+            <CurrencyInput
               id="tax"
-              type="number"
               value={tax}
-              onChange={(e) => handleTaxChange(e.target.value)}
+              onChange={onTaxChange}
               className="w-24"
-              step="0.01"
-              min="0"
             />
           </div>
         </div>
@@ -114,18 +106,15 @@ const BillTotals = ({
               </span>
             </Label>
             <span className="text-lg font-semibold font-title">
-              ${tip.toFixed(2)}
+              ${formatCurrency(tip)}
             </span>
           </div>
 
           <div className="flex items-center gap-2 justify-between">
-            <Input
-              type="number"
+            <CurrencyInput
               value={tip}
-              onChange={(e) => handleTipAmountChange(e.target.value)}
+              onChange={handleTipAmountChange}
               className="w-24"
-              min="0"
-              step="0.01"
             />
             <div className="w-full px-8 flex gap-2 items-center">
               <Button
@@ -163,7 +152,7 @@ const BillTotals = ({
         <div className="flex justify-between text-lg font-semibold">
           <span className="text-lg font-semibold font-title">Total</span>
           <span className="text-lg font-semibold font-title">
-            ${total.toFixed(2)}
+            ${formatCurrency(total)}
           </span>
         </div>
       </div>

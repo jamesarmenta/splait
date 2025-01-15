@@ -32,6 +32,13 @@ interface ParticipantSummariesProps {
   onParticipantPaidChange?: (participantId: string, hasPaid: boolean) => void;
 }
 
+const formatCurrency = (amount: number): string => {
+  return amount.toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+};
+
 const ParticipantSummary = ({
   participant,
   items,
@@ -67,12 +74,12 @@ const ParticipantSummary = ({
           <div className="h-6 w-6 rounded-full bg-muted flex items-center justify-center">
             {getEmojiByName(participant.emojiName)}
           </div>
-          <span className="font-medium text-foreground">
+          <span className="font-medium text-foreground font-title">
             {participant.name}
           </span>
         </div>
         <span className="font-semibold text-foreground font-title">
-          ${total.toFixed(2)}
+          ${formatCurrency(total)}
         </span>
       </div>
       {isExpanded && (
@@ -90,7 +97,7 @@ const ParticipantSummary = ({
                   </span>
                 )}
               </span>
-              <span>${item.amount.toFixed(2)}</span>
+              <span>${formatCurrency(item.amount)}</span>
             </div>
           ))}
           {(participantTax > 0 || participantTip > 0) && (
@@ -99,18 +106,18 @@ const ParticipantSummary = ({
               <div className="text-xs text-muted-foreground">
                 <div className="flex justify-between">
                   <span>Subtotal</span>
-                  <span>${participantTotal.toFixed(2)}</span>
+                  <span>${formatCurrency(participantTotal)}</span>
                 </div>
                 {participantTax > 0 && (
                   <div className="flex justify-between">
                     <span>Tax</span>
-                    <span>${participantTax.toFixed(2)}</span>
+                    <span>${formatCurrency(participantTax)}</span>
                   </div>
                 )}
                 {participantTip > 0 && (
                   <div className="flex justify-between">
                     <span>Tip</span>
-                    <span>${participantTip.toFixed(2)}</span>
+                    <span>${formatCurrency(participantTip)}</span>
                   </div>
                 )}
               </div>

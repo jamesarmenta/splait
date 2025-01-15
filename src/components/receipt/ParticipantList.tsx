@@ -27,6 +27,7 @@ const ParticipantList = ({
 
   const handleAddParticipant = () => {
     if (!newParticipantName.trim()) return;
+    if (newParticipantName.length > 25) return;
     onAddParticipant(newParticipantName);
     setNewParticipantName("");
   };
@@ -40,6 +41,7 @@ const ParticipantList = ({
             placeholder="Add participant"
             value={newParticipantName}
             onChange={(e) => setNewParticipantName(e.target.value)}
+            maxLength={25}
             onKeyDown={(e) => e.key === "Enter" && handleAddParticipant()}
             className="flex-1"
           />
