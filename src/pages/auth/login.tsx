@@ -9,30 +9,58 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const { signIn } = useAuth();
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [sent, setSent] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       setError("");
       setLoading(true);
-      await signIn(email, password);
-      navigate(-1);
+      await signIn(email);
+      setSent(true);
     } catch (err) {
-      setError("Failed to sign in");
+      setError("Failed to send login link");
     } finally {
       setLoading(false);
     }
   };
+
+  if (sent) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <Card className="w-full max-w-md p-6 space-y-6">
+          <div className="text-center space-y-2">
+            <h1 className="text-3xl font-bold font-title">Check your email</h1>
+            <p className="text-muted-foreground">
+              We sent you a magic link to sign in. Click the link in your email
+              to continue.
+            </p>
+          </div>
+          <Button
+            variant="outline"
+            className="w-full"
+            onClick={() => {
+              setSent(false);
+              setEmail("");
+            }}
+          >
+            Use a different email
+          </Button>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <Card className="w-full max-w-md p-6 space-y-6">
         <div className="text-center space-y-2">
           <h1 className="text-3xl font-bold font-title">Sign In</h1>
-          <p className="text-muted-foreground">Welcome back to Totali</p>
+          <p className="text-muted-foreground">
+            Enter your email to receive a magic link
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -46,37 +74,14 @@ export default function LoginPage() {
             />
           </div>
 
-          <div className="space-y-2">
-            <Input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-
           {error && (
             <p className="text-sm text-destructive text-center">{error}</p>
           )}
 
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Signing in..." : "Sign In"}
+            {loading ? "Sending link..." : "Send Magic Link"}
           </Button>
         </form>
-
-        <div className="text-center space-y-2">
-          <p className="text-sm text-muted-foreground">
-            Don't have an account?{" "}
-            <Button
-              variant="link"
-              className="p-0 h-auto font-normal"
-              onClick={() => navigate("/auth/signup")}
-            >
-              Sign up
-            </Button>
-          </p>
-        </div>
       </Card>
     </div>
   );

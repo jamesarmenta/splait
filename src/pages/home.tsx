@@ -40,7 +40,7 @@ const getRandomEmojis = (count: number) => {
 
 export default function HomePage() {
   const navigate = useNavigate();
-  const { user: authUser, requireAuth } = useAuth();
+  const { user: authUser, requireAuth, signOut } = useAuth();
   const [isCreating, setIsCreating] = React.useState(false);
   const [bills, setBills] = React.useState<Bill[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
@@ -181,9 +181,26 @@ export default function HomePage() {
 
         <Card className="p-6">
           <div className="space-y-4">
-            <h2 className="text-lg font-semibold font-title flex items-center gap-2">
-              You
-            </h2>
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold font-title flex items-center gap-2">
+                You
+                {authUser && (
+                  <span className="text-sm text-muted-foreground ml-2">
+                    Signed in as {authUser.email}
+                  </span>
+                )}
+              </h2>
+              {authUser && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={signOut}
+                  className="text-muted-foreground"
+                >
+                  Sign out
+                </Button>
+              )}
+            </div>
             {user && !isEditing ? (
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -302,7 +319,7 @@ export default function HomePage() {
           <form onSubmit={handleJoinBill} className="space-y-4">
             <h2 className="text-lg font-semibold font-title">Join a Bill</h2>
             <div className="space-y-4 flex flex-col items-center">
-              <div className="flex items-center gap-4 justify-center mb-2 w-full">
+              <div className="flex items-center gap-2 justify-center mb-2 w-full">
                 {[0, 1, 2].map((index) => (
                   <div
                     key={index}
