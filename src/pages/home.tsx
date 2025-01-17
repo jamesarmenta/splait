@@ -184,11 +184,6 @@ export default function HomePage() {
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold font-title flex items-center gap-2">
                 You
-                {authUser && (
-                  <span className="text-sm text-muted-foreground ml-2">
-                    Signed in as {authUser.email}
-                  </span>
-                )}
               </h2>
               {authUser && (
                 <Button
@@ -209,9 +204,15 @@ export default function HomePage() {
                   </div>
                   <div>
                     <p className="font-medium">{user.name}</p>
-                    <p className="text-muted-foreground text-xs">
-                      This name will be used when joining bills
-                    </p>
+                    {authUser ? (
+                      <p className="text-muted-foreground text-xs">
+                        Signed in as {authUser.email}
+                      </p>
+                    ) : (
+                      <p className="text-muted-foreground text-xs">
+                        This name will be used when joining bills
+                      </p>
+                    )}
                   </div>
                 </div>
                 <Button
@@ -319,7 +320,7 @@ export default function HomePage() {
           <form onSubmit={handleJoinBill} className="space-y-4">
             <h2 className="text-lg font-semibold font-title">Join a Bill</h2>
             <div className="space-y-4 flex flex-col items-center">
-              <div className="flex items-center gap-2 justify-center mb-2 w-full">
+              <div className="flex items-center gap-2 justify-center w-full">
                 {[0, 1, 2].map((index) => (
                   <div
                     key={index}
