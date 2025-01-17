@@ -10,14 +10,15 @@ import {
   Pencil,
   Shuffle,
   Camera,
+  LogIn,
 } from "lucide-react";
 import { createNewBill } from "@/types/bill";
 import { api } from "@/lib/api";
 import { userStorage, EMOJI_NAMES } from "@/lib/user";
 import { getEmojiByName } from "@/lib/emoji";
+import { useAuth } from "@/lib/auth";
 import type { Bill } from "@/types/bill";
 import type { User } from "@/lib/user";
-import ItemizedList from "./../components/receipt/ItemizedList.tsx";
 import type { EmojiName } from "@/lib/emoji";
 
 const JOIN_EMOJI_OPTIONS: EmojiName[] = [
@@ -39,6 +40,7 @@ const getRandomEmojis = (count: number) => {
 
 export default function HomePage() {
   const navigate = useNavigate();
+  const { user: authUser, requireAuth } = useAuth();
   const [isCreating, setIsCreating] = React.useState(false);
   const [bills, setBills] = React.useState<Bill[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
@@ -78,10 +80,7 @@ export default function HomePage() {
   }, [loadBills]);
 
   const handleCreateBill = async () => {
-    if (!user) {
-      alert("Please set your name first");
-      return;
-    }
+    if (!requireAuth()) return;
 
     try {
       setIsCreating(true);
@@ -167,9 +166,17 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-background p-8">
       <div className="max-w-2xl mx-auto space-y-8">
-        <div className="text-center space-y-2">
-          <h1 className="text-3xl font-bold font-title">Totali</h1>
-          <p className="text-muted-foreground">Split, tap, done</p>
+        <div className="flex items-center justify-between">
+          <div className="text-center space-y-2">
+            <h1 className="text-3xl font-bold font-title">Totali</h1>
+            <p className="text-muted-foreground">Split, tap, done</p>
+          </div>
+          {!authUser && (
+            <Button variant="outline" onClick={() => navigate("/auth/login")}>
+              <LogIn className="mr-2 h-4 w-4" />
+              Sign in
+            </Button>
+          )}
         </div>
 
         <Card className="p-6">
@@ -261,11 +268,16 @@ export default function HomePage() {
               className="h-16 text-lg"
               variant="clickable"
               size="lg"
-              disabled={isCreating || !user}
+              disabled={isCreating}
             >
               <Plus className="mr-2 h-5 w-5" />
               <div className="flex flex-col items-start text-left">
                 <span className="text-base">Start from Scratch</span>
+                {!authUser && (
+                  <span className="text-xs text-muted-foreground">
+                    Sign in required
+                  </span>
+                )}
               </div>
             </Button>
             <Button
@@ -391,7 +403,6 @@ export default function HomePage() {
           )}
         </div>
       </div>
-      <ItemizedList />
     </div>
   );
 }
