@@ -1,215 +1,171 @@
-import type { Bill } from "@/types/bill";
+import { supabase } from "./supabase";
+import type { Database } from "@/types/supabase";
 
-// Sample dummy data
-let BILLS: Bill[] = [
-  {
-    id: "bill_1",
-    title: "Dinner at Italian Restaurant",
-    createdAt: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
-    updatedAt: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
-    items: [
-      {
-        id: "item_1",
-        name: "Margherita Pizza",
-        price: 14.99,
-        assignedTo: [
-          { participantId: "user_1", portions: 2 },
-          { participantId: "user_2", portions: 1 },
-        ],
-      },
-      {
-        id: "item_2",
-        name: "Tiramisu",
-        price: 8.99,
-        assignedTo: [{ participantId: "user_2", portions: 1 }],
-      },
-    ],
-    participants: [
-      {
-        id: "user_1",
-        name: "John",
-        emojiName: "pizza",
-      },
-      {
-        id: "user_2",
-        name: "Sarah",
-        emojiName: "butterfly",
-      },
-    ],
-    tax: {
-      amount: 2.4,
-      percentage: 10,
-    },
-    tip: {
-      amount: 4.8,
-      percentage: 20,
-    },
-    shareUrl: "https://split.bill/bill_1",
-  },
-  {
-    id: "bill_2",
-    title: "Movie Night",
-    createdAt: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
-    updatedAt: new Date(Date.now() - 172800000).toISOString(),
-    items: [
-      {
-        id: "item_3",
-        name: "Movie Tickets",
-        price: 32.0,
-        assignedTo: [
-          { participantId: "user_3", portions: 1 },
-          { participantId: "user_4", portions: 1 },
-        ],
-      },
-      {
-        id: "item_4",
-        name: "Popcorn & Drinks",
-        price: 15.5,
-        assignedTo: [
-          { participantId: "user_3", portions: 1 },
-          { participantId: "user_4", portions: 1 },
-        ],
-      },
-    ],
-    participants: [
-      {
-        id: "user_3",
-        name: "Mike",
-        emojiName: "game",
-      },
-      {
-        id: "user_4",
-        name: "Emma",
-        emojiName: "star",
-      },
-    ],
-    tax: {
-      amount: 3.8,
-      percentage: 8,
-    },
-    tip: {
-      amount: 0,
-      percentage: 0,
-    },
-    shareUrl: "https://split.bill/bill_2",
-  },
-  {
-    id: "bill_3",
-    title: "Group Dinner at Sushi Place",
-    createdAt: new Date(Date.now() - 259200000).toISOString(), // 3 days ago
-    updatedAt: new Date(Date.now() - 259200000).toISOString(),
-    items: [
-      {
-        id: "item_5",
-        name: "Dragon Roll",
-        price: 16.99,
-        assignedTo: [{ participantId: "user_5", portions: 1 }],
-      },
-      {
-        id: "item_6",
-        name: "California Roll",
-        price: 12.99,
-        assignedTo: [{ participantId: "user_6", portions: 1 }],
-      },
-      {
-        id: "item_7",
-        name: "Spicy Tuna Roll",
-        price: 14.99,
-        assignedTo: [], // Unassigned item
-      },
-      {
-        id: "item_8",
-        name: "Miso Soup",
-        price: 3.99,
-        assignedTo: [{ participantId: "user_7", portions: 1 }],
-      },
-      {
-        id: "item_9",
-        name: "Edamame",
-        price: 5.99,
-        assignedTo: [], // Unassigned item
-      },
-      {
-        id: "item_10",
-        name: "Green Tea Ice Cream",
-        price: 4.99,
-        assignedTo: [{ participantId: "user_5", portions: 1 }],
-      },
-      {
-        id: "item_11",
-        name: "Sake",
-        price: 18.99,
-        assignedTo: [
-          { participantId: "user_5", portions: 1 },
-          { participantId: "user_6", portions: 1 },
-          { participantId: "user_7", portions: 1 },
-        ],
-      },
-    ],
-    participants: [
-      {
-        id: "user_5",
-        name: "Alex",
-        emojiName: "sushi",
-      },
-      {
-        id: "user_6",
-        name: "Taylor",
-        emojiName: "fish",
-      },
-      {
-        id: "user_7",
-        name: "Jordan",
-        emojiName: "drink",
-      },
-    ],
-    tax: {
-      amount: 7.89,
-      percentage: 10,
-    },
-    tip: {
-      amount: 15.78,
-      percentage: 20,
-    },
-    shareUrl: "https://split.bill/bill_3",
-  },
-];
+type Bill = Database["public"]["Tables"]["bills"]["Row"];
+type BillParticipant = Database["public"]["Tables"]["bill_participants"]["Row"];
+type BillItem = Database["public"]["Tables"]["bill_items"]["Row"];
+type UserProfile = Database["public"]["Tables"]["user_profiles"]["Row"];
 
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+export interface FormattedBill extends Bill {
+  participants: (BillParticipant & {
+    profile?: UserProfile;
+  })[];
+  items: (BillItem & {
+    assignedTo: Array<{
+      participantId: string;
+      portions: number;
+    }>;
+  })[];
+}
+
+export interface BillSummary {
+  id: string;
+  title: string;
+  updated_at: string;
+  participant_count: number;
+  total_amount: number;
+}
 
 export const api = {
-  async createBill(bill: Bill): Promise<Bill> {
-    // Simulate network delay
-    BILLS.unshift(bill); // Add to start of array
+  async getBill(id: string): Promise<FormattedBill> {
+    const { data: bill, error: billError } = await supabase
+      .from("bills")
+      .select(
+        `
+        *,
+        participants:bill_participants(*, profile:user_profiles(*)),
+        items:bill_items(*)
+      `,
+      )
+      .eq("id", id)
+      .single();
+
+    if (billError) throw billError;
+    if (!bill) throw new Error("Bill not found");
+
     return bill;
   },
 
-  async getBill(id: string): Promise<Bill> {
-    const bill = BILLS.find((b) => b.id === id);
-    if (!bill) {
-      throw new Error("Bill not found");
-    }
-    return bill;
+  async getUserBills(): Promise<BillSummary[]> {
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+
+    if (userError) throw userError;
+    if (!user) throw new Error("Not authenticated");
+
+    const { data: bills, error } = await supabase
+      .from("bills")
+      .select(
+        `
+        id,
+        title,
+        updated_at,
+        created_at,
+        created_by,
+        total_amount,
+        bill_participants (id)
+      `,
+      )
+      .or(`created_by.eq.${user.id},bill_participants.user_id.eq.${user.id}`)
+      .order("updated_at", { ascending: false });
+
+    if (error) throw error;
+
+    return (bills || []).map((bill: any) => ({
+      id: bill.id,
+      title: bill.title,
+      updated_at: bill.updated_at || bill.created_at,
+      participant_count: bill.bill_participants?.length || 0,
+      total_amount: bill.total_amount || 0,
+    }));
   },
 
-  async updateBill(id: string, bill: Bill): Promise<Bill> {
-    const index = BILLS.findIndex((b) => b.id === id);
-    if (index === -1) {
-      throw new Error("Bill not found");
-    }
-    BILLS[index] = bill;
-    return bill;
+  async updateBill(id: string, updates: Partial<Bill>): Promise<void> {
+    const { error } = await supabase.from("bills").update(updates).eq("id", id);
+    if (error) throw error;
   },
 
-  async deleteBill(id: string): Promise<void> {
-    const index = BILLS.findIndex((b) => b.id === id);
-    if (index === -1) {
-      throw new Error("Bill not found");
-    }
-    BILLS.splice(index, 1);
+  async addParticipant(
+    billId: string,
+    name: string,
+    emojiName: string,
+    profileId?: string,
+  ): Promise<void> {
+    const { error } = await supabase.from("bill_participants").insert({
+      bill_id: billId,
+      name,
+      emoji_name: emojiName,
+      profile_id: profileId,
+    });
+    if (error) throw error;
   },
 
-  async listBills(): Promise<Bill[]> {
-    return BILLS;
+  async removeParticipant(participantId: string): Promise<void> {
+    const { error } = await supabase
+      .from("bill_participants")
+      .delete()
+      .eq("id", participantId);
+    if (error) throw error;
+  },
+
+  async addItem(
+    billId: string,
+    item: { name: string; price: number },
+  ): Promise<void> {
+    const { error } = await supabase.from("bill_items").insert({
+      bill_id: billId,
+      ...item,
+    });
+    if (error) throw error;
+  },
+
+  async updateItem(
+    itemId: string,
+    updates: { name: string; price: number },
+  ): Promise<void> {
+    const { error } = await supabase
+      .from("bill_items")
+      .update(updates)
+      .eq("id", itemId);
+    if (error) throw error;
+  },
+
+  async deleteItem(itemId: string): Promise<void> {
+    const { error } = await supabase
+      .from("bill_items")
+      .delete()
+      .eq("id", itemId);
+    if (error) throw error;
+  },
+
+  async assignItem(
+    itemId: string,
+    participantId: string,
+    portions: number = 1,
+  ): Promise<void> {
+    if (portions === 0) {
+      // Delete assignment
+      const { error } = await supabase
+        .from("item_assignments")
+        .delete()
+        .eq("item_id", itemId)
+        .eq("participant_id", participantId);
+      if (error) throw error;
+    } else {
+      // Upsert assignment
+      const { error } = await supabase.from("item_assignments").upsert(
+        {
+          item_id: itemId,
+          participant_id: participantId,
+          portions,
+        },
+        {
+          onConflict: "item_id,participant_id",
+        },
+      );
+      if (error) throw error;
+    }
   },
 };

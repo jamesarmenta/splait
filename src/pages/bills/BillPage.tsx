@@ -1,15 +1,12 @@
 import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useBill } from "@/hooks/useBill";
-import { createNewBill } from "@/types/bill";
 import BillEditor from "@/components/home";
-import { api } from "@/lib/api";
-import { userStorage } from "@/lib/user";
+import { api, type FormattedBill } from "@/lib/api";
 
 export default function BillPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [bill, setBill] = React.useState(null);
+  const [bill, setBill] = React.useState<FormattedBill | null>(null);
   const [error, setError] = React.useState<string | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
 
@@ -21,51 +18,11 @@ export default function BillPage() {
 
     const loadBill = async () => {
       try {
-        const loadedBill = await api.getBill(id);
-        setBill(loadedBill);
-
-        // Add current user if they exist and aren't already in the bill
-        const user = userStorage.getUser();
-        if (
-          user &&
-          !loadedBill.participants.some((p) => p.name === user.name)
-        ) {
-          const updatedBill = {
-            ...loadedBill,
-            participants: [
-              ...loadedBill.participants,
-              {
-                id: crypto.randomUUID(),
-                name: user.name,
-                emojiName: user.emojiName,
-              },
-            ],
-          };
-          await api.updateBill(id, updatedBill);
-          setBill(updatedBill);
-        }
+        const billData = await api.getBill(id);
+        setBill(billData);
       } catch (err) {
-        if (err.message === "Bill not found") {
-          const newBill = createNewBill();
-          newBill.id = id;
-
-          // Add current user if they exist
-          const user = userStorage.getUser();
-          if (user) {
-            newBill.participants = [
-              {
-                id: crypto.randomUUID(),
-                name: user.name,
-                emojiName: user.emojiName,
-              },
-            ];
-          }
-
-          await api.createBill(newBill);
-          setBill(newBill);
-        } else {
-          setError("Failed to load bill");
-        }
+        console.error("Failed to load bill:", err);
+        setError("Failed to load bill");
       } finally {
         setIsLoading(false);
       }
@@ -74,13 +31,82 @@ export default function BillPage() {
     loadBill();
   }, [id, navigate]);
 
-  const handleBillUpdate = React.useCallback(async (updatedBill: Bill) => {
+  const handleBillUpdate = React.useCallback(
+    async (updates: Partial<FormattedBill>) => {
+      if (!bill?.id) return;
+      try {
+        await api.updateBill(bill.id, updates);
+      } catch (err) {
+        console.error("Failed to update bill:", err);
+      }
+    },
+    [bill?.id],
+  );
+
+  const handleAddParticipant = React.useCallback(
+    async (name: string) => {
+      if (!bill?.id) return;
+      try {
+        await api.addParticipant(bill.id, name, "happy");
+      } catch (err) {
+        console.error("Failed to add participant:", err);
+      }
+    },
+    [bill?.id],
+  );
+
+  const handleRemoveParticipant = React.useCallback(
+    async (participantId: string) => {
+      try {
+        await api.removeParticipant(participantId);
+      } catch (err) {
+        console.error("Failed to remove participant:", err);
+      }
+    },
+    [],
+  );
+
+  const handleAddItem = React.useCallback(
+    async (item: { name: string; price: number }) => {
+      if (!bill?.id) return;
+      try {
+        await api.addItem(bill.id, item);
+      } catch (err) {
+        console.error("Failed to add item:", err);
+      }
+    },
+    [bill?.id],
+  );
+
+  const handleUpdateItem = React.useCallback(
+    async (itemId: string, updates: { name: string; price: number }) => {
+      try {
+        await api.updateItem(itemId, updates);
+      } catch (err) {
+        console.error("Failed to update item:", err);
+      }
+    },
+    [],
+  );
+
+  const handleDeleteItem = React.useCallback(async (itemId: string) => {
     try {
-      await api.updateBill(updatedBill.id, updatedBill);
+      await api.deleteItem(itemId);
     } catch (err) {
-      console.error("Failed to save bill:", err);
+      console.error("Failed to delete item:", err);
     }
   }, []);
+
+  const handleAssignItem = React.useCallback(
+    async (itemId: string, participantId: string, portions: number = 1) => {
+      try {
+        await api.assignItem(itemId, participantId, portions);
+      } catch (err) {
+        console.error("Failed to assign item:", err);
+      }
+    },
+    [],
+  );
 
   if (isLoading) {
     return (
@@ -100,5 +126,16 @@ export default function BillPage() {
 
   if (!bill) return null;
 
-  return <BillEditor initialBill={bill} onBillUpdate={handleBillUpdate} />;
+  return (
+    <BillEditor
+      initialBill={bill}
+      onBillUpdate={handleBillUpdate}
+      onAddParticipant={handleAddParticipant}
+      onRemoveParticipant={handleRemoveParticipant}
+      onAddItem={handleAddItem}
+      onUpdateItem={handleUpdateItem}
+      onDeleteItem={handleDeleteItem}
+      onAssignItem={handleAssignItem}
+    />
+  );
 }
